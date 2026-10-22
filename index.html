@@ -66,6 +66,12 @@
             <span class="tab-badge warning" id="top_pending_badge" style="display: none;">0</span>
           </button>
 
+          <button class="nav-tab-btn" data-tab="datasets">
+            <span>📚</span>
+            <span>Open Datasets</span>
+            <span class="tab-badge" id="top_datasets_badge" style="background: rgba(6, 182, 212, 0.2); color: var(--accent-cyan);">176 Ready</span>
+          </button>
+
           <button class="nav-tab-btn" data-tab="keys">
             <span>🔑</span>
             <span>Key Rotator</span>
@@ -203,10 +209,14 @@
             <div class="node-box" id="node_ingestor">
               <div class="node-top">
                 <span class="node-badge">PHASE 1</span>
+                <button class="phase-toggle-btn active" data-phase="ingestion" title="Click to Pause/Resume Ingestion Phase">
+                  <span class="phase-toggle-dot"></span>
+                  <span class="phase-toggle-label">Active</span>
+                </button>
                 <div class="node-icon-ring">📡</div>
               </div>
               <div class="node-name">Ingestion Worker</div>
-              <div class="node-desc">Harvests from local sources, RSS feeds, and Dravidian dumps</div>
+              <div class="node-desc">Harvests from local sources, RSS feeds, open datasets & PDFs</div>
               <div class="node-metric-strip">
                 <span>Ingested Count:</span>
                 <span class="node-count" id="count_ingestor">0</span>
@@ -218,6 +228,10 @@
             <div class="node-box" id="node_normalizer">
               <div class="node-top">
                 <span class="node-badge">PHASE 2</span>
+                <button class="phase-toggle-btn active" data-phase="normalization" title="Click to Pause/Resume Normalizer Phase">
+                  <span class="phase-toggle-dot"></span>
+                  <span class="phase-toggle-label">Active</span>
+                </button>
                 <div class="node-icon-ring">🧬</div>
               </div>
               <div class="node-name">Morphology & Unicode</div>
@@ -233,10 +247,14 @@
             <div class="node-box" id="node_judge">
               <div class="node-top">
                 <span class="node-badge">PHASE 3</span>
+                <button class="phase-toggle-btn active" data-phase="judging" title="Click to Pause/Bypass Dual-LLM Judge (Instant Fast-Track)">
+                  <span class="phase-toggle-dot"></span>
+                  <span class="phase-toggle-label">Active</span>
+                </button>
                 <div class="node-icon-ring">⚖️</div>
               </div>
               <div class="node-name">LLM Quality Judge</div>
-              <div class="node-desc">Rotating LLMs & Dravidian critic evaluate syntax & drop translationese</div>
+              <div class="node-desc">Qwen Extractor + Gemma Proofreader (or Heuristic Critic fast-track when paused)</div>
               <div class="node-metric-strip">
                 <span>Judged Count:</span>
                 <span class="node-count" id="count_judge">0</span>
@@ -248,13 +266,21 @@
             <div class="node-box" id="node_staging">
               <div class="node-top">
                 <span class="node-badge">PHASE 4</span>
+                <button class="phase-toggle-btn active" data-phase="staging" title="Click to Pause/Resume Staging Phase">
+                  <span class="phase-toggle-dot"></span>
+                  <span class="phase-toggle-label">Active</span>
+                </button>
                 <div class="node-icon-ring">📦</div>
               </div>
               <div class="node-name">Staging & HITL Queue</div>
               <div class="node-desc">Stores curated records in Human Review Queue & Google Colab bridge</div>
               <div class="node-metric-strip">
-                <span>Staged Records:</span>
+                <span>Total Staged:</span>
                 <span class="node-count" id="count_staging">0</span>
+              </div>
+              <div class="node-submetric-strip" style="font-size: 0.72rem; color: var(--text-dim); display: flex; justify-content: space-between; margin-top: 3px;">
+                <span>Auto-Approved: <b id="sub_staging_approved" style="color: var(--accent-emerald);">0</b></span>
+                <span>HITL Pending: <b id="sub_staging_pending" style="color: var(--accent-amber);">0</b></span>
               </div>
               <div class="stage-progress-bar"><div class="stage-progress-fill"></div></div>
             </div>
@@ -370,6 +396,9 @@
             <button class="btn-filter" data-filter="approved">
               All Approved
             </button>
+            <button class="btn-filter" data-filter="open_dataset">
+              Open Datasets
+            </button>
             <button class="btn-filter" data-filter="rejected">
               Rejected
             </button>
@@ -395,6 +424,55 @@
         <div class="review-cards-list" id="review_cards_container">
           <div style="text-align: center; padding: 2rem; color: var(--text-dim);">
             Loading review queue...
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- ================================================================== -->
+      <!-- TAB: OPEN DATASETS LIBRARY & REVIEW                                -->
+      <!-- ================================================================== -->
+      <section class="tab-pane" id="tab_datasets">
+        
+        <div class="pipeline-diagram-card" style="margin-bottom: 1.5rem;">
+          <div class="diagram-header" style="flex-wrap: wrap; gap: 12px;">
+            <div>
+              <div class="diagram-title" style="margin-bottom: 6px;">
+                <span>📚 Top Open-Source Malayalam Training Datasets</span>
+                <span class="tab-badge" style="background: rgba(16, 185, 129, 0.2); color: var(--accent-emerald);">Downloaded Locally</span>
+              </div>
+              <p style="font-size: 0.84rem; color: var(--text-muted); line-height: 1.6; margin: 0;">
+                Curated, verified, and pre-formatted datasets stored offline in <code style="color: var(--accent-cyan); font-family: var(--font-mono);">data/sources/open_datasets/</code>. These include foundational pre-training corpora (CulturaX / IndicCorp SMC), instruction-response fine-tuning (Alpaca Instruct Malayalam), structured Malayalam Wikipedia articles, and dialect metadata.
+              </p>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-secondary" id="btn_sync_open_datasets" style="font-size: 0.8rem; padding: 0.5rem 1rem;">
+                <span>🔄</span> Refresh / Sync Datasets
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Open Datasets Cards Grid -->
+        <div class="open-datasets-grid" id="open_datasets_container">
+          <div style="text-align: center; padding: 2rem; color: var(--text-dim);">
+            Loading Open Datasets catalog...
+          </div>
+        </div>
+
+        <!-- Dataset Record Preview Inspector -->
+        <div class="pipeline-diagram-card" style="margin-top: 1.5rem;">
+          <div class="panel-header">
+            <div class="panel-title">
+              <span>🔍 Selected Dataset Sample Inspector</span>
+            </div>
+            <div id="dataset_sample_source" style="font-size: 0.75rem; color: var(--accent-cyan); font-family: var(--font-mono);">
+              data/sources/open_datasets/alpaca_instruct_malayalam.jsonl
+            </div>
+          </div>
+          <div class="dataset-sample-viewer" id="dataset_sample_content" style="background: rgba(5, 8, 15, 0.85); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.25rem; font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-main); white-space: pre-wrap; line-height: 1.6; max-height: 380px; overflow-y: auto;">
+            Select a dataset above to preview real parsed JSONL training pairs...
           </div>
         </div>
 

@@ -29,8 +29,9 @@ DATA_DIR = os.path.join(BASE_DIR, "data")
 SOURCES_DIR = os.path.join(DATA_DIR, "sources")
 NOVELS_DIR = os.path.join(SOURCES_DIR, "novels")
 UPLOADS_DIR = os.path.join(SOURCES_DIR, "uploads")
+OPEN_DATASETS_DIR = os.path.join(SOURCES_DIR, "open_datasets")
 
-for d in [SOURCES_DIR, NOVELS_DIR, UPLOADS_DIR]:
+for d in [SOURCES_DIR, NOVELS_DIR, UPLOADS_DIR, OPEN_DATASETS_DIR]:
     os.makedirs(d, exist_ok=True)
 
 # Curated public Malayalam RSS feeds (with timeout resilience)
@@ -179,12 +180,34 @@ class MalayalamIngestor:
         return items
 
     def fetch_from_local_files(self) -> List[Dict[str, Any]]:
-        """Reads unread records from JSON and TXT files in data/sources/ and data/sources/novels/."""
+        """Reads unread records from JSON, JSONL, and TXT files in data/sources/ and open_datasets/."""
         items = []
-        search_dirs = [SOURCES_DIR, NOVELS_DIR, UPLOADS_DIR]
+        search_dirs = [SOURCES_DIR, NOVELS_DIR, UPLOADS_DIR, OPEN_DATASETS_DIR]
         for sdir in search_dirs:
             for file_path in glob.glob(os.path.join(sdir, "*.*")):
-                if file_path.endswith(".json"):
+                if file_path.endswith(".jsonl"):
+                    try:
+                        with open(file_path, "r", encoding="utf-8") as f:
+                            for line in f:
+                                line = line.strip()
+                                if not line:
+                                    continue
+                                entry = json.loads(line)
+                                raw = entry.get("raw_text") or entry.get("output") or entry.get("text") or ""
+                                if raw:
+                                    text_hash = hash(raw[:80])
+                                    if text_hash not in self.seen_hashes:
+                                        self.seen_hashes.add(text_hash)
+                                        items.append({
+                                            "id": entry.get("id", f"open_{int(time.time()*1000)}_{random.randint(100, 999)}"),
+                                            "source": entry.get("source", os.path.basename(file_path)),
+                                            "title": entry.get("title") or entry.get("instruction", "Open Malayalam Corpus"),
+                                            "raw_text": raw,
+                                            "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
+                                        })
+                    except Exception as e:
+                        print(f"Error reading JSONL file {file_path}: {e}", file=sys.stderr)
+                elif file_path.endswith(".json") and not file_path.endswith("dataset_index.json"):
                     try:
                         with open(file_path, "r", encoding="utf-8") as f:
                             data = json.load(f)

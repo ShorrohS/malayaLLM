@@ -168,6 +168,39 @@ class MalayaDashboard {
     if (btnSaveOllama) {
       btnSaveOllama.addEventListener('click', () => this.saveOllamaConfig());
     }
+
+    // Per-Phase Play/Pause Controls
+    document.querySelectorAll('.phase-toggle-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const phase = btn.dataset.phase;
+        try {
+          const resp = await fetch('/api/pipeline/phase/toggle', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phase })
+          });
+          if (resp.ok) {
+            const res = await resp.json();
+            const isEnabled = res.data ? res.data.is_enabled : true;
+            btn.classList.toggle('paused', !isEnabled);
+            const label = btn.querySelector('.phase-toggle-label');
+            if (label) label.textContent = isEnabled ? 'Active' : 'Paused';
+            const nodeBox = btn.closest('.node-box');
+            if (nodeBox) nodeBox.classList.toggle('phase-paused', !isEnabled);
+            this.pollStatus();
+          }
+        } catch (err) {
+          console.error("Phase toggle error:", err);
+        }
+      });
+    });
+
+    // Open Datasets Refresh Button
+    const btnSyncOpen = document.getElementById('btn_sync_open_datasets');
+    if (btnSyncOpen) {
+      btnSyncOpen.addEventListener('click', () => this.syncOpenDatasets());
+    }
   }
 
   switchTab(tabName) {
@@ -181,6 +214,8 @@ class MalayaDashboard {
 
     if (tabName === 'review') {
       this.loadReviewQueue();
+    } else if (tabName === 'datasets') {
+      this.loadOpenDatasets();
     } else if (tabName === 'keys') {
       this.loadKeysStatus();
     } else if (tabName === 'colab') {
@@ -243,12 +278,27 @@ class MalayaDashboard {
       this.dom.topPendingBadge.style.display = (queueStats.pending_count > 0) ? 'inline-block' : 'none';
     }
 
-    // 4. Update Node Visual Ring Highlights
+    // 4. Update Per-Phase Play/Pause Indicators
+    if (data.phase_enabled) {
+      Object.entries(data.phase_enabled).forEach(([phase, isEnabled]) => {
+        const btn = document.querySelector(`.phase-toggle-btn[data-phase="${phase}"]`);
+        if (btn) {
+          btn.classList.toggle('paused', !isEnabled);
+          const label = btn.querySelector('.phase-toggle-label');
+          if (label) label.textContent = isEnabled ? 'Active' : 'Paused';
+          const nodeBox = btn.closest('.node-box');
+          if (nodeBox) nodeBox.classList.toggle('phase-paused', !isEnabled);
+        }
+      });
+    }
+
+    // 5. Update Node Visual Ring Highlights & Counts
+    const totalStaged = (queueStats.total_count !== undefined && queueStats.total_count > 0) ? queueStats.total_count : (counters.judged || 0);
     const nodes = [
       { el: this.dom.nodeIngestor, phase: 'ingestion', countEl: this.dom.countIngestor, count: counters.ingested },
       { el: this.dom.nodeNormalizer, phase: 'normalization', countEl: this.dom.countNormalizer, count: counters.normalized },
       { el: this.dom.nodeJudge, phase: 'judging', countEl: this.dom.countJudge, count: counters.judged },
-      { el: this.dom.nodeStaging, phase: 'staging', countEl: this.dom.countStaging, count: counters.approved || queueStats.total_count }
+      { el: this.dom.nodeStaging, phase: 'staging', countEl: this.dom.countStaging, count: totalStaged }
     ];
 
     nodes.forEach(n => {
@@ -259,6 +309,15 @@ class MalayaDashboard {
         n.countEl.textContent = (n.count || 0).toLocaleString();
       }
     });
+
+    const subApproved = document.getElementById('sub_staging_approved');
+    if (subApproved) {
+      subApproved.textContent = (counters.approved || queueStats.auto_approved_count || 0).toLocaleString();
+    }
+    const subPending = document.getElementById('sub_staging_pending');
+    if (subPending) {
+      subPending.textContent = (queueStats.pending_count || 0).toLocaleString();
+    }
 
     // 5. Update Live Item Inspector
     if (liveItem && liveItem.title) {
@@ -359,10 +418,19 @@ class MalayaDashboard {
   async loadReviewQueue() {
     if (!this.dom.reviewCardsContainer) return;
     try {
-      const resp = await fetch(`/api/queue/review?status=${this.reviewFilter}&limit=50`);
+      const fetchStatus = (this.reviewFilter === 'open_dataset') ? 'all' : this.reviewFilter;
+      const resp = await fetch(`/api/queue/review?status=${fetchStatus}&limit=100`);
       if (!resp.ok) return;
       const data = await resp.json();
-      this.renderReviewCards(data.items || []);
+      let items = data.items || [];
+      if (this.reviewFilter === 'open_dataset') {
+        items = items.filter(item => {
+          const s = (item.source || '').toLowerCase();
+          const t = (item.title || '').toLowerCase();
+          return s.includes('open_') || s.includes('alpaca') || s.includes('culturax') || s.includes('wiki') || s.includes('indic') || s.includes('jsonl') || t.includes('alpaca') || t.includes('culturax') || t.includes('wikipedia');
+        });
+      }
+      this.renderReviewCards(items);
     } catch (e) {
       console.error("Failed to load review queue:", e);
     }
@@ -717,6 +785,124 @@ class MalayaDashboard {
     }).catch(e => {
       alert("Failed to copy script.");
     });
+  }
+
+  // ==========================================
+  // Tab: Open Datasets Library
+  // ==========================================
+
+  async loadOpenDatasets() {
+    const container = document.getElementById('open_datasets_container');
+    if (!container) return;
+    try {
+      const resp = await fetch('/api/datasets/open_sources');
+      if (!resp.ok) return;
+      const data = await resp.json();
+      const manifest = data.manifest || {};
+      this.renderOpenDatasets(manifest);
+    } catch (err) {
+      console.error("Failed to load open datasets:", err);
+    }
+  }
+
+  renderOpenDatasets(manifest) {
+    const container = document.getElementById('open_datasets_container');
+    if (!container) return;
+    const datasets = manifest.datasets || {};
+    const keys = Object.keys(datasets);
+    if (keys.length === 0) {
+      container.innerHTML = `<div style="text-align:center; padding: 2rem; color: var(--text-dim);">No open datasets found. Click 'Refresh / Sync Datasets'.</div>`;
+      return;
+    }
+
+    container.innerHTML = '';
+    keys.forEach(k => {
+      const d = datasets[k];
+      const card = document.createElement('div');
+      card.className = 'open-dataset-card';
+      const isReady = d.status === 'ready' || d.status === 'ready_for_training';
+      const isGated = d.status === 'gated_requires_hf_login';
+      const badgeClass = isReady ? 'ready' : (isGated ? 'gated' : 'commercial');
+      const badgeText = isReady ? '✓ Ready (Downloaded)' : (isGated ? '🔒 HF Gated' : 'ℹ Curated');
+
+      card.innerHTML = `
+        <div>
+          <div class="dataset-card-top">
+            <div>
+              <div class="dataset-card-title">${this.escapeHtml(k.replace(/_/g, ' '))}</div>
+              <span style="font-size: 0.72rem; color: var(--text-muted);">${this.escapeHtml(d.type || '')}</span>
+            </div>
+            <span class="dataset-badge ${badgeClass}">${badgeText}</span>
+          </div>
+          <div class="dataset-meta-list">
+            <div><strong>Source:</strong> <a href="${d.source}" target="_blank" style="color: var(--accent-cyan); text-decoration: none;">${this.escapeHtml(d.source)}</a></div>
+            ${d.records_cached !== undefined ? `<div><strong>Records Cached:</strong> <code style="color: var(--accent-emerald);">${d.records_cached}</code></div>` : ''}
+            ${d.local_path ? `<div><strong>Local File:</strong> <code>${this.escapeHtml(d.local_path)}</code></div>` : ''}
+            ${d.file_size_bytes ? `<div><strong>Size:</strong> ${(d.file_size_bytes / 1024).toFixed(1)} KB</div>` : ''}
+            ${d.instructions ? `<div style="color: var(--accent-amber); margin-top: 4px;"><em>${this.escapeHtml(d.instructions)}</em></div>` : ''}
+          </div>
+        </div>
+        <div class="dataset-card-actions">
+          ${d.sample_record ? `
+            <button class="btn-secondary" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;" onclick="dashboard.previewDatasetSample('${k}')">
+              <span>👁</span> Inspect Sample
+            </button>
+          ` : ''}
+          ${d.local_path ? `
+            <a href="/data/sources/open_datasets/${d.local_path.split('/').pop()}" download class="btn-primary" style="font-size: 0.75rem; padding: 0.4rem 0.8rem; text-decoration: none;">
+              <span>⬇</span> Download JSONL
+            </a>
+          ` : ''}
+        </div>
+      `;
+      container.appendChild(card);
+    });
+
+    this._datasetsManifest = manifest;
+    for (const k of keys) {
+      if (datasets[k].sample_record) {
+        this.previewDatasetSample(k);
+        break;
+      }
+    }
+  }
+
+  previewDatasetSample(datasetKey) {
+    if (!this._datasetsManifest || !this._datasetsManifest.datasets) return;
+    const d = this._datasetsManifest.datasets[datasetKey];
+    if (!d) return;
+
+    const viewer = document.getElementById('dataset_sample_content');
+    const srcLabel = document.getElementById('dataset_sample_source');
+
+    if (srcLabel) {
+      srcLabel.textContent = d.local_path || d.source;
+    }
+
+    if (viewer) {
+      if (d.sample_record) {
+        viewer.textContent = JSON.stringify(d.sample_record, null, 2);
+      } else {
+        viewer.textContent = `No local sample cached yet for ${datasetKey}.`;
+      }
+    }
+  }
+
+  async syncOpenDatasets() {
+    const btn = document.getElementById('btn_sync_open_datasets');
+    if (btn) btn.textContent = '⏳ Syncing Open Datasets...';
+    try {
+      const resp = await fetch('/api/datasets/import_open_sources', { method: 'POST' });
+      const data = await resp.json();
+      if (data.success) {
+        alert(`✓ Open Datasets Synchronized!\nTotal Records: ${data.total_imported}\nAlpaca Instruct: ${data.alpaca_count}\nCulturaX: ${data.culturax_count}\nWikipedia: ${data.wiki_count}`);
+        this.loadOpenDatasets();
+      }
+    } catch (err) {
+      alert(`Sync failed: ${err}`);
+    } finally {
+      if (btn) btn.innerHTML = '<span>🔄</span> Refresh / Sync Datasets';
+    }
   }
 }
 

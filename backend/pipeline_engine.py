@@ -47,10 +47,35 @@ class PipelineEngine:
         self.processed_since_start = 0
         self.last_engine_used = "Offline Linguistic Critic"
 
+        # Granular Per-Phase Play/Pause Controls
+        self.phase_enabled = {
+            "ingestion": True,
+            "normalization": True,
+            "judging": True,
+            "staging": True
+        }
+
         # Ensure database is synced to initial idle state
         run_state = get_run_state()
         if run_state.get("status") == "running":
             update_run_state(status="paused", current_phase="idle")
+
+    def toggle_phase(self, phase: str, enabled: Optional[bool] = None) -> Dict[str, Any]:
+        """Toggles or sets the active/paused state of an individual pipeline phase."""
+        with self._lock:
+            p = phase.lower().strip()
+            if p in self.phase_enabled:
+                if enabled is not None:
+                    self.phase_enabled[p] = bool(enabled)
+                else:
+                    self.phase_enabled[p] = not self.phase_enabled[p]
+                state_str = "ACTIVE (Running)" if self.phase_enabled[p] else "PAUSED (Bypassed)"
+                log_event("default_run", "orchestrator", "WARN" if not self.phase_enabled[p] else "INFO", f"⚙️ Phase '{p.upper()}' updated to: {state_str}")
+            return {
+                "phase": p,
+                "is_enabled": self.phase_enabled.get(p, True),
+                "all_phases": dict(self.phase_enabled)
+            }
 
     def start(self) -> Dict[str, Any]:
         """Resumes or starts the continuous autonomous pipeline loop."""
@@ -110,6 +135,12 @@ class PipelineEngine:
             # -------------------------------------------------------------
             # PHASE 1: INGESTION
             # -------------------------------------------------------------
+            if not self.phase_enabled.get("ingestion", True):
+                update_run_state(current_phase="ingestion_paused")
+                log_event("default_run", "ingestion", "INFO", "⏸ Phase 1 (Ingestion) PAUSED: waiting to clear downstream backlog")
+                time.sleep(1.5)
+                return True
+
             update_run_state(current_phase="ingestion")
             log_event("default_run", "ingestion", "INFO", "📡 Harvesting Malayalam text from data sources...")
 
@@ -137,90 +168,118 @@ class PipelineEngine:
             # -------------------------------------------------------------
             # PHASE 2: MORPHOLOGY & UNICODE NORMALIZATION
             # -------------------------------------------------------------
-            update_run_state(current_phase="normalization")
-            log_event("default_run", "normalizer", "INFO", f"🧬 Normalizing morphology and enforcing density on: '{title[:45]}...'")
+            if not self.phase_enabled.get("normalization", True):
+                cleaned_text = raw_text
+                density = 1.0
+                density_passed = True
+                chillu_fixes = 0
+                pii_redacted = 0
+                norm_notes = ["Phase 2 (Normalization) bypassed by operator"]
+                log_event("default_run", "normalizer", "WARN", f"⚡ Phase 2 (Normalizer) PAUSED: Bypassed morphology normalization for '{title[:35]}'")
+            else:
+                update_run_state(current_phase="normalization")
+                log_event("default_run", "normalizer", "INFO", f"🧬 Normalizing morphology and enforcing density on: '{title[:45]}...'")
 
-            norm_result = normalizer_worker.process(raw_text)
-            cleaned_text = norm_result["cleaned_text"]
-            density = norm_result["malayalam_density"]
-            density_passed = norm_result["density_passed"]
-            chillu_fixes = norm_result["chillu_fixes"]
-            pii_redacted = norm_result["pii_redacted"]
-            norm_notes = norm_result["audit_notes"]
+                norm_result = normalizer_worker.process(raw_text)
+                cleaned_text = norm_result["cleaned_text"]
+                density = norm_result["malayalam_density"]
+                density_passed = norm_result["density_passed"]
+                chillu_fixes = norm_result["chillu_fixes"]
+                pii_redacted = norm_result["pii_redacted"]
+                norm_notes = norm_result["audit_notes"]
 
-            set_live_item({
-                "item_id": item_id,
-                "source": source,
-                "title": title,
-                "phase": "normalization",
-                "raw_text": raw_text[:400],
-                "cleaned_text": cleaned_text[:400],
-                "malayalam_density": density,
-                "fluency_score": 0.0,
-                "chillu_fixes": chillu_fixes,
-                "pii_redacted": pii_redacted
-            })
-            time.sleep(self.step_delay * 0.4)
+                set_live_item({
+                    "item_id": item_id,
+                    "source": source,
+                    "title": title,
+                    "phase": "normalization",
+                    "raw_text": raw_text[:400],
+                    "cleaned_text": cleaned_text[:400],
+                    "malayalam_density": density,
+                    "fluency_score": 0.0,
+                    "chillu_fixes": chillu_fixes,
+                    "pii_redacted": pii_redacted
+                })
+                time.sleep(self.step_delay * 0.4)
 
-            # Enforce >= 60% Malayalam Unicode density gating
-            if not density_passed:
-                increment_run_counters(rejected_density_count=1)
+                # Enforce >= 60% Malayalam Unicode density gating
+                if not density_passed:
+                    increment_run_counters(rejected_density_count=1)
+                    log_event(
+                        "default_run", "normalizer", "WARN",
+                        f"⚠️ Gating Dropped: Malayalam density {density*100:.1f}% < 60% threshold for '{title[:35]}'"
+                    )
+                    time.sleep(self.step_delay * 0.3)
+                    return True
+
+                increment_run_counters(normalized_count=1)
                 log_event(
-                    "default_run", "normalizer", "WARN",
-                    f"⚠️ Gating Dropped: Malayalam density {density*100:.1f}% < 60% threshold for '{title[:35]}'"
+                    "default_run", "normalizer", "SUCCESS",
+                    f"✓ Normalized: {chillu_fixes} Chillus fixed, {pii_redacted} PII redacted, density: {density*100:.1f}%"
                 )
-                time.sleep(self.step_delay * 0.3)
-                return True
-
-            increment_run_counters(normalized_count=1)
-            log_event(
-                "default_run", "normalizer", "SUCCESS",
-                f"✓ Normalized: {chillu_fixes} Chillus fixed, {pii_redacted} PII redacted, density: {density*100:.1f}%"
-            )
 
             # -------------------------------------------------------------
             # PHASE 3: DUAL-LLM QUALITY PIPELINE (QWEN + GEMMA)
             # -------------------------------------------------------------
-            update_run_state(current_phase="judging")
-            log_event("default_run", "dual_llm", "INFO", f"🤖 Dual-LLM Pass 1: Qwen Extractor processing '{title[:35]}...'")
+            if not self.phase_enabled.get("judging", True):
+                # Bypassed LLM Judge - fast track in <10ms to clear bottleneck!
+                update_run_state(current_phase="judging_bypassed")
+                log_event("default_run", "dual_llm", "WARN", f"⚡ Phase 3 (LLM Judge) PAUSED: Fast-tracking '{title[:35]}' directly to Staging")
+                qwen_text = cleaned_text
+                gemma_text = cleaned_text
+                fluency_score = 0.95
+                confidence_score = 0.90
+                quality_rating = "Fast-Track (LLM Bypassed)"
+                is_auto_approved = True
+                dual_res = {"critique_notes": ["Phase 3 Dual-LLM bypassed by operator to clear bottleneck"]}
+                self.last_engine_used = "Fast-Track Bypass"
+                increment_run_counters(judged_count=1)
+            else:
+                update_run_state(current_phase="judging")
+                log_event("default_run", "dual_llm", "INFO", f"🤖 Dual-LLM Pass 1: Qwen Extractor processing '{title[:35]}...'")
 
-            dual_res = dual_llm_pipeline.process_dual_pass(cleaned_text, title)
-            qwen_text = dual_res.get("qwen_extracted_text", cleaned_text)
-            gemma_text = dual_res.get("cleaned_text", qwen_text)
-            fluency_score = dual_res.get("fluency_score", 1.0)
-            confidence_score = dual_res.get("confidence_score", 0.90)
-            quality_rating = dual_res.get("quality_rating", "High Quality")
-            is_auto_approved = dual_res.get("is_auto_approved", False)
-            qwen_engine = dual_res.get("qwen_engine", "Qwen")
-            gemma_engine = dual_res.get("gemma_engine", "Gemma")
-            
-            self.last_engine_used = f"{qwen_engine} ➔ {gemma_engine}"
-            increment_run_counters(judged_count=1)
+                dual_res = dual_llm_pipeline.process_dual_pass(cleaned_text, title)
+                qwen_text = dual_res.get("qwen_extracted_text", cleaned_text)
+                gemma_text = dual_res.get("cleaned_text", qwen_text)
+                fluency_score = dual_res.get("fluency_score", 1.0)
+                confidence_score = dual_res.get("confidence_score", 0.90)
+                quality_rating = dual_res.get("quality_rating", "High Quality")
+                is_auto_approved = dual_res.get("is_auto_approved", False)
+                qwen_engine = dual_res.get("qwen_engine", "Qwen")
+                gemma_engine = dual_res.get("gemma_engine", "Gemma")
+                
+                self.last_engine_used = f"{qwen_engine} ➔ {gemma_engine}"
+                increment_run_counters(judged_count=1)
 
-            set_live_item({
-                "item_id": item_id,
-                "source": source,
-                "title": title,
-                "phase": "judging",
-                "raw_text": raw_text[:400],
-                "cleaned_text": gemma_text[:400],
-                "malayalam_density": density,
-                "fluency_score": fluency_score,
-                "confidence_score": confidence_score,
-                "chillu_fixes": chillu_fixes,
-                "pii_redacted": pii_redacted,
-                "auto_approved": 1 if is_auto_approved else 0
-            })
-            time.sleep(self.step_delay * 0.4)
+                set_live_item({
+                    "item_id": item_id,
+                    "source": source,
+                    "title": title,
+                    "phase": "judging",
+                    "raw_text": raw_text[:400],
+                    "cleaned_text": gemma_text[:400],
+                    "malayalam_density": density,
+                    "fluency_score": fluency_score,
+                    "confidence_score": confidence_score,
+                    "chillu_fixes": chillu_fixes,
+                    "pii_redacted": pii_redacted,
+                    "auto_approved": 1 if is_auto_approved else 0
+                })
+                time.sleep(self.step_delay * 0.4)
 
-            log_event(
-                "default_run", "dual_llm", "SUCCESS",
-                f"✓ Dual-LLM Verified: Confidence {confidence_score*100:.1f}%, Fluency {fluency_score*100:.1f}% [{quality_rating}]"
-            )
+                log_event(
+                    "default_run", "dual_llm", "SUCCESS",
+                    f"✓ Dual-LLM Verified: Confidence {confidence_score*100:.1f}%, Fluency {fluency_score*100:.1f}% [{quality_rating}]"
+                )
 
             # -------------------------------------------------------------
             # PHASE 4: STAGING & AUTOMATED FILTERING (AUTO-APPROVE >= 85%)
             # -------------------------------------------------------------
+            if not self.phase_enabled.get("staging", True):
+                update_run_state(current_phase="staging_paused")
+                log_event("default_run", "staging", "WARN", f"⏸ Phase 4 (Staging) PAUSED: skipping ledger write for '{title[:35]}'")
+                time.sleep(self.step_delay * 0.3)
+                return True
             update_run_state(current_phase="staging")
             all_notes = norm_notes + dual_res.get("critique_notes", [])
             item_status = "approved" if is_auto_approved else "pending_approval"
@@ -333,6 +392,7 @@ class PipelineEngine:
             "current_phase": run_state.get("current_phase", "idle"),
             "iteration_count": run_state.get("iteration_count", 0),
             "total_items_processed": run_state.get("total_items_processed", 0),
+            "phase_enabled": dict(self.phase_enabled),
             "counters": {
                 "ingested": run_state.get("ingested_count", 0),
                 "normalized": run_state.get("normalized_count", 0),

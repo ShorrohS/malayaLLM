@@ -1,0 +1,36 @@
+{
+  "version": "2.3.0",
+  "last_synced": "2026-10-22 21:29:39",
+  "storage_path": "C:\\Users\\ssro2\\Desktop\\Projects\\Learn\\malayaLLM\\data\\sources\\open_datasets",
+  "datasets": {
+    "Alpaca_Instruct_Malayalam": {
+      "source": "https://huggingface.co/datasets/VishnuPJ/Alpaca_Instruct_Malayalam",
+      "type": "Supervised Instruction Tuning (SFT)",
+      "records_cached": 100,
+      "file": "alpaca_instruct_malayalam.jsonl",
+      "status": "ready"
+    },
+    "CulturaX_IndicCorp_SMC": {
+      "source": "https://huggingface.co/datasets/VishnuPJ/Malayalam_CultureX_IndicCorp_SMC",
+      "type": "Foundational Web & Monolingual Pretraining",
+      "records_cached": 68,
+      "file": "culturax_indiccorp_malayalam.jsonl",
+      "status": "ready"
+    },
+    "Malayalam_Wikipedia": {
+      "source": "https://ml.wikipedia.org/",
+      "type": "Clean Encyclopedic Malayalam Knowledge",
+      "records_cached": 8,
+      "file": "malayalam_wikipedia_corpus.jsonl",
+      "status": "ready"
+    },
+    "Malayalam_Web_Text_Cleaned": {
+      "source": "https://huggingface.co/datasets/siyah1/malayalam-dataset-llm",
+      "type": "Deduplicated Web Text (Gated)",
+      "records_cached": 0,
+      "status": "gated_requires_hf_login",
+      "instructions": "Accept terms at https://huggingface.co/datasets/siyah1/malayalam-dataset-llm and paste HF token in Key Rotator"
+    }
+  },
+  "total_records": 176
+}

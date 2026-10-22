@@ -35,6 +35,7 @@ from workers.normalizer import normalizer_worker
 from workers.judge import quality_judge
 from workers.pdf_extractor import pdf_extractor
 from workers.dual_llm import dual_llm_pipeline
+from workers.dataset_importer import dataset_importer
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PORT = int(os.environ.get("PORT", 8080))
@@ -78,6 +79,11 @@ class QueueActionPayload(BaseModel):
     edited_cleaned_text: Optional[str] = None
 
 
+class PhaseTogglePayload(BaseModel):
+    phase: str
+    enabled: Optional[bool] = None
+
+
 class OllamaConfigPayload(BaseModel):
     endpoint: Optional[str] = None
     model: Optional[str] = None
@@ -108,6 +114,13 @@ def step_pipeline():
     return JSONResponse(content={"success": True, "message": "Single step executed", "data": status})
 
 
+@app.post("/api/pipeline/phase/toggle")
+def toggle_pipeline_phase(payload: PhaseTogglePayload):
+    """Enables or pauses an individual pipeline step (ingestion, normalization, judging, staging)."""
+    res = pipeline_engine.toggle_phase(payload.phase, payload.enabled)
+    return JSONResponse(content={"success": True, "data": res})
+
+
 @app.get("/api/pipeline/status")
 def get_pipeline_status():
     """Returns real-time pipeline status, iteration counters, active item, and recent logs."""
@@ -120,6 +133,24 @@ def get_pipeline_logs(limit: int = 50):
     """Retrieves recent event logs."""
     logs = get_recent_logs(limit=limit)
     return JSONResponse(content={"logs": logs})
+
+
+# ==========================================
+# Open Datasets Endpoints
+# ==========================================
+
+@app.get("/api/datasets/open_sources")
+def get_open_datasets_summary():
+    """Returns local and open source Malayalam datasets, record counts, file locations, and sample items."""
+    manifest = dataset_importer.get_manifest()
+    return JSONResponse(content={"success": True, "manifest": manifest})
+
+
+@app.post("/api/datasets/import_open_sources")
+def trigger_open_datasets_sync(limit_per_dataset: int = 50):
+    """Downloads/syncs the open datasets locally into data/sources/open_datasets/."""
+    res = dataset_importer.sync_all_open_datasets(limit_per_dataset=limit_per_dataset)
+    return JSONResponse(content=res)
 
 
 # ==========================================
