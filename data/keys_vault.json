@@ -1,0 +1,19 @@
+{
+  "keys": {
+    "groq": [],
+    "gemini": [],
+    "openrouter": [],
+    "nvidia": [],
+    "ollama": []
+  },
+  "ollama_endpoint": "http://localhost:11434",
+  "ollama_model": "qwen3.5:4b",
+  "fallback_cascade": [
+    "groq",
+    "gemini",
+    "openrouter",
+    "nvidia",
+    "ollama"
+  ],
+  "updated_at": "2026-10-22 16:52:33"
+}

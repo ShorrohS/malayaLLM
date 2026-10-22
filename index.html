@@ -3,494 +3,618 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CrewAI Operations Center | Visual Agent & Workflow Orchestrator</title>
+  <title>malayaLLM v2.3.0 | Autonomous Modular Malayalam Operations Center</title>
   
   <!-- Modern Geometric Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
   
-  <!-- Prism Syntax Highlighting (Light Theme) -->
-  <link rel="stylesheet" href="assets/prism-light.min.css">
-  
-  <!-- Core Design System -->
-  <link rel="stylesheet" href="css/style.css">
+  <!-- Operations Center CSS Design System -->
+  <link rel="stylesheet" href="css/operations.css">
 </head>
 <body>
 
-  <div class="app-container">
+  <div class="app-wrapper">
     
-    <!-- Persistent Enterprise Utility Header -->
-    <header class="top-nav">
-      <!-- Left: Branding & Status Badge -->
-      <div class="brand-section">
-        <button class="btn-icon-toggle" id="btn_toggle_sidebar" title="Toggle Components Sidebar (Ctrl+B)">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="3" y1="12" x2="21" y2="12"></line>
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <line x1="3" y1="18" x2="21" y2="18"></line>
-          </svg>
-        </button>
-
-        <div class="logo-icon" title="CrewAI Operations Center">
-          <svg viewBox="0 0 24 24">
-            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-          </svg>
+    <!-- Top Persistent Operations Navbar -->
+    <header class="top-navbar">
+      
+      <!-- Left: Branding & System State -->
+      <div class="nav-brand">
+        <div class="brand-icon-box" title="malayaLLM - Malayalam Language Operations Center">
+          മ
         </div>
-        <div class="brand-text-block">
-          <div class="brand-title">
-            <span>CrewAI</span>
-            <span class="brand-subtitle">Ops Center</span>
+        <div class="brand-title-wrap">
+          <div class="brand-name">
+            <span>malayaLLM</span>
+            <span class="version-badge">v2.3.0</span>
           </div>
-        </div>
-
-        <button class="status-indicator-badge healthy" id="btn_header_status" title="Workspace Health Status">
-          <span class="status-dot"></span>
-          <span id="header_status_text">All Systems Operational</span>
-        </button>
-
-        <span class="active-crew-tag" id="active_crew_pill" title="Active Crew Project">
-          PrivateLocalCrew
-        </span>
-      </div>
-
-      <!-- Center: Action Toolbar (Subtle Segmented Controls with Responsive Overflow) -->
-      <div class="center-toolbar" id="center_toolbar">
-        <div class="toolbar-primary-group" id="toolbar_primary_group">
-          <button class="btn-tool active" id="btn_toggle_snap" title="Toggle 20px Grid Snapping">
-            <span>🧲</span> <span class="tool-label">Snap</span>
-          </button>
-          <button class="btn-tool" id="btn_fit_view" title="Fit All Nodes in View">
-            <span>🔍</span> <span class="tool-label">Fit</span>
-          </button>
-          <button class="btn-tool" id="btn_reset_view" title="Reset Zoom to 100%">
-            <span>🎯</span> <span class="tool-label">100%</span>
-          </button>
-          <div class="toolbar-divider"></div>
-          <button class="btn-tool" id="btn_load_json" title="Open Saved Workflow JSON">
-            <span>📂</span> <span class="tool-label">Load</span>
-          </button>
-          <input type="file" id="load_json_input" accept=".json" style="display: none;">
-          <button class="btn-tool" id="btn_save_json" title="Save Workflow JSON">
-            <span>💾</span> <span class="tool-label">Save</span>
-          </button>
-          <button class="btn-tool" id="btn_clear_canvas" title="Clear Canvas">
-            <span>🗑️</span>
-          </button>
-        </div>
-
-        <!-- Collapsible Overflow Dropdown for Compact Screen Widths -->
-        <div class="toolbar-overflow-container" id="toolbar_overflow_container">
-          <button class="btn-tool overflow-trigger-btn" id="btn_toolbar_overflow" title="More Canvas & File Controls">
-            <span>⚙️</span> <span class="overflow-btn-text">Tools ▾</span>
-          </button>
-          <div class="toolbar-overflow-dropdown" id="toolbar_overflow_dropdown">
-            <button class="overflow-item" id="overflow_snap_grid">
-              <span>🧲</span> <span>Snap to Grid</span>
-            </button>
-            <button class="overflow-item" id="overflow_fit_canvas">
-              <span>🔍</span> <span>Fit View</span>
-            </button>
-            <button class="overflow-item" id="overflow_reset_view">
-              <span>🎯</span> <span>Reset Zoom (100%)</span>
-            </button>
-            <div class="overflow-divider"></div>
-            <button class="overflow-item" id="overflow_load_json">
-              <span>📂</span> <span>Load Workflow JSON</span>
-            </button>
-            <button class="overflow-item" id="overflow_save_json">
-              <span>💾</span> <span>Save Workflow JSON</span>
-            </button>
-            <button class="overflow-item text-danger" id="overflow_clear_canvas">
-              <span>🗑️</span> <span>Clear Canvas</span>
-            </button>
-          </div>
+          <span class="brand-subtitle">Autonomous Modular Malayalam Data Pipeline</span>
         </div>
       </div>
 
-      <!-- Right: Health Pill, Key Vault & Primary Action -->
-      <div class="nav-actions">
-        <!-- Persistent Interactive System Health & Connectivity Pill -->
-        <button class="health-pulse-pill" id="btn_health_pill" title="Click to view LLM Providers & Connectivity Diagnostics">
+      <!-- Center: Master Control [ Play / Pause / Step ] -->
+      <div class="nav-master-controls">
+        <button class="btn-master-play" id="btn_master_play" title="Toggle Autonomous Pipeline Loop">
+          <span id="master_play_icon">▶</span>
+          <span id="master_play_text">Resume Pipeline</span>
+        </button>
+
+        <button class="btn-step" id="btn_step" title="Execute a single item through Ingestion, Normalization, Judging, and Staging">
+          <span>⏭</span>
+          <span>Step</span>
+        </button>
+
+        <div class="pipeline-state-pill paused" id="pipeline_state_pill">
           <span class="pulse-dot"></span>
-          <span id="health_pill_text">Ollama: Scanning...</span>
-        </button>
+          <span id="pipeline_state_text">PAUSED</span>
+        </div>
+      </div>
 
-        <!-- Live Key Vault Button with Active Count -->
-        <button class="btn btn-secondary btn-sm" id="btn_open_vault" title="Manage Cloud API Keys & Local Ollama Models">
-          <span>🔑</span>
-          <span class="btn-text-full">Key Vault</span>
-          <span class="badge-count" id="vault_key_count">0/5</span>
-        </button>
+      <!-- Right: Navigation Tabs & Export Action -->
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <nav class="nav-tabs-wrapper">
+          <button class="nav-tab-btn active" data-tab="pipeline">
+            <span>📡</span>
+            <span>Pipeline Monitor</span>
+          </button>
+          
+          <button class="nav-tab-btn" data-tab="review">
+            <span>📋</span>
+            <span>Review Queue</span>
+            <span class="tab-badge warning" id="top_pending_badge" style="display: none;">0</span>
+          </button>
 
-        <!-- Diagnostics Button -->
-        <button class="btn btn-secondary btn-sm" id="btn_open_diagnostics" title="Open Network & Topology Diagnostics">
-          <span>🩺</span>
-          <span class="btn-text-full">Diagnostics</span>
-          <span class="badge-count warning" id="diag_warning_count" style="display: none;">0</span>
-        </button>
+          <button class="nav-tab-btn" data-tab="keys">
+            <span>🔑</span>
+            <span>Key Rotator</span>
+          </button>
 
-        <!-- Live Dataset Review Queue Button (HITL Approval) -->
-        <button class="btn btn-secondary btn-sm" id="btn_open_review" title="Open Malayalam Dataset Review Queue (Human-in-the-Loop Approval)">
-          <span>📋</span>
-          <span class="btn-text-full">Review Queue</span>
-          <span class="badge-count warning" id="top_pending_badge" style="display: none;">0</span>
-        </button>
+          <button class="nav-tab-btn" data-tab="colab">
+            <span>📦</span>
+            <span>Training & Export</span>
+          </button>
+        </nav>
 
-        <!-- Primary Action -->
-        <button class="btn btn-primary btn-sm" id="btn_export_zip" title="Package and Download Turnkey CrewAI Project">
-          <span>⚡</span> <span class="btn-text-full">Export ZIP</span>
+        <button class="btn-primary" id="btn_trigger_export" style="padding: 0.5rem 1rem; font-size: 0.8rem;">
+          <span>⚡</span>
+          <span>Export Dataset</span>
         </button>
       </div>
+
     </header>
 
-    <!-- Main Workspace Area -->
-    <main class="main-workspace">
-      
-      <!-- Left Sidebar: Categorized, Search-Filterable Operations Panel -->
-      <aside class="palette-dock" id="palette_dock">
-        <!-- Search Filter Header -->
-        <div class="sidebar-search-box">
-          <span class="search-icon">🔍</span>
-          <input type="text" id="component_search" class="search-input" placeholder="Search components... (Ctrl+K)" autocomplete="off">
-          <button class="search-clear-btn" id="search_clear_btn" style="display: none;">✕</button>
+    <!-- Main Content Workspace -->
+    <main class="main-content-area">
+
+      <!-- ================================================================== -->
+      <!-- TAB 1: PIPELINE MONITOR                                            -->
+      <!-- ================================================================== -->
+      <section class="tab-pane active" id="tab_pipeline">
+        
+        <!-- Dual-LLM Quality Pipeline Banner -->
+        <div class="dual-llm-banner">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 1.3rem;">🤖</span>
+            <div>
+              <div style="font-weight: 700; font-size: 0.92rem; color: var(--text-main);">Dual-LLM Automated Quality Pipeline</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Worker / Extractor + Linguistic Reviewer Architecture</div>
+            </div>
+          </div>
+          <div class="dual-llm-pills-wrap">
+            <span class="model-role-pill qwen" title="Initial worker and text extractor">
+              <span>⚡ Worker:</span>
+              <strong>Ollama Qwen (qwen3.5:4b)</strong>
+            </span>
+            <span class="model-role-pill gemma" title="Linguistic reviewer & syntax critic">
+              <span>⚖️ Reviewer:</span>
+              <strong>Ollama Gemma (gemma4:e4b)</strong>
+            </span>
+            <span class="model-role-pill threshold" title="Directly staged for QLoRA / Unsloth export">
+              <span>🎯 Auto-Approve:</span>
+              <strong>≥ 85% Score</strong>
+            </span>
+            <span class="model-role-pill" style="border-color: rgba(245, 158, 11, 0.4); color: var(--accent-amber); background: rgba(245, 158, 11, 0.08);" title="Routed to human operator queue">
+              <span>📋 HITL Queue:</span>
+              <strong>&lt; 85% Score</strong>
+            </span>
+          </div>
         </div>
 
-        <!-- Scrollable Accordion Sections -->
-        <div class="sidebar-scroll-container">
+        <!-- Custom Malayalam PDF Ingestion Dropzone -->
+        <div class="pdf-upload-card" id="pdf_upload_zone">
+          <div class="pdf-upload-info">
+            <div class="pdf-upload-icon">📄</div>
+            <div>
+              <div style="font-weight: 600; font-size: 0.95rem; color: var(--text-main); margin-bottom: 2px;">
+                Direct Malayalam PDF Ingestion & OCR/Text Cleaner
+              </div>
+              <div style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.4;">
+                Upload Malayalam novels, historical records, or scientific papers. Automatically strips running headers, page numbers (<span style="font-family: var(--font-mono); color: var(--accent-cyan);">പേജ് \d+</span>), watermarks, heals broken line syllables, and chunks into 150–350 word semantic units.
+              </div>
+              <div id="pdf_upload_status" style="font-size: 0.78rem; color: var(--accent-emerald); margin-top: 4px; display: none;"></div>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+            <input type="file" id="pdf_file_input" accept=".pdf" style="display: none;">
+            <button class="btn-secondary" id="btn_browse_pdf" style="padding: 0.6rem 1rem;">
+              <span>📂</span> Choose PDF
+            </button>
+            <button class="btn-primary" id="btn_upload_pdf" style="padding: 0.6rem 1.1rem; display: none;">
+              <span>⬆️</span> Extract & Ingest
+            </button>
+          </div>
+        </div>
+
+        <!-- Live KPI Banner -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon-box cyan">📡</div>
+            <div class="kpi-info">
+              <span class="kpi-label">Total Processed</span>
+              <span class="kpi-value" id="kpi_total_processed">0</span>
+              <span class="kpi-sub">End-to-end items curated</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon-box emerald">⚡</div>
+            <div class="kpi-info">
+              <span class="kpi-label">Throughput Velocity</span>
+              <span class="kpi-value" id="kpi_throughput">0.0 /min</span>
+              <span class="kpi-sub">Real-time processing rate</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon-box violet">🧬</div>
+            <div class="kpi-info">
+              <span class="kpi-label">Avg Malayalam Density</span>
+              <span class="kpi-value" id="kpi_avg_density">88.4%</span>
+              <span class="kpi-sub">Strict ≥ 60% gating filter</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon-box amber">📋</div>
+            <div class="kpi-info">
+              <span class="kpi-label">Review Queue Backlog</span>
+              <span class="kpi-value" id="kpi_pending_queue">0</span>
+              <span class="kpi-sub">Awaiting operator sign-off</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Visual Animated Pipeline Flow Diagram -->
+        <div class="pipeline-diagram-card">
+          <div class="diagram-header">
+            <div class="diagram-title">
+              <span>⚡ Autonomous Pipeline Stage Nodes</span>
+              <span style="font-size: 0.75rem; color: var(--text-dim); font-weight: normal;">• Zero-bloat non-blocking Python workers</span>
+            </div>
+            <div style="font-size: 0.78rem; color: var(--accent-emerald);">
+              ● SQLite State Synchronized (WAL Mode)
+            </div>
+          </div>
+
+          <div class="flow-nodes-container">
+            <!-- Node 1: Ingestor -->
+            <div class="node-box" id="node_ingestor">
+              <div class="node-top">
+                <span class="node-badge">PHASE 1</span>
+                <div class="node-icon-ring">📡</div>
+              </div>
+              <div class="node-name">Ingestion Worker</div>
+              <div class="node-desc">Harvests from local sources, RSS feeds, and Dravidian dumps</div>
+              <div class="node-metric-strip">
+                <span>Ingested Count:</span>
+                <span class="node-count" id="count_ingestor">0</span>
+              </div>
+              <div class="stage-progress-bar"><div class="stage-progress-fill"></div></div>
+            </div>
+
+            <!-- Node 2: Normalizer -->
+            <div class="node-box" id="node_normalizer">
+              <div class="node-top">
+                <span class="node-badge">PHASE 2</span>
+                <div class="node-icon-ring">🧬</div>
+              </div>
+              <div class="node-name">Morphology & Unicode</div>
+              <div class="node-desc">NFKC, Chillu fix (ൺ,ൻ,ർ,ൽ,ൾ,ൿ), PII redaction, ≥60% density gate</div>
+              <div class="node-metric-strip">
+                <span>Normalized Count:</span>
+                <span class="node-count" id="count_normalizer">0</span>
+              </div>
+              <div class="stage-progress-bar"><div class="stage-progress-fill"></div></div>
+            </div>
+
+            <!-- Node 3: LLM Judge -->
+            <div class="node-box" id="node_judge">
+              <div class="node-top">
+                <span class="node-badge">PHASE 3</span>
+                <div class="node-icon-ring">⚖️</div>
+              </div>
+              <div class="node-name">LLM Quality Judge</div>
+              <div class="node-desc">Rotating LLMs & Dravidian critic evaluate syntax & drop translationese</div>
+              <div class="node-metric-strip">
+                <span>Judged Count:</span>
+                <span class="node-count" id="count_judge">0</span>
+              </div>
+              <div class="stage-progress-bar"><div class="stage-progress-fill"></div></div>
+            </div>
+
+            <!-- Node 4: Staging Exporter -->
+            <div class="node-box" id="node_staging">
+              <div class="node-top">
+                <span class="node-badge">PHASE 4</span>
+                <div class="node-icon-ring">📦</div>
+              </div>
+              <div class="node-name">Staging & HITL Queue</div>
+              <div class="node-desc">Stores curated records in Human Review Queue & Google Colab bridge</div>
+              <div class="node-metric-strip">
+                <span>Staged Records:</span>
+                <span class="node-count" id="count_staging">0</span>
+              </div>
+              <div class="stage-progress-bar"><div class="stage-progress-fill"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Split Grid: Live Item Inspector + Terminal Console -->
+        <div class="split-pipeline-grid">
           
-          <!-- Category 1: Agents -->
-          <div class="palette-category-group" data-category="agents">
-            <div class="palette-category-header">
-              <span class="cat-title">🤖 Agents</span>
-              <span class="cat-count" id="cat_agents_count">1</span>
+          <!-- Left: Live Item Inspector -->
+          <div class="inspector-card">
+            <div class="panel-header">
+              <div class="panel-title">
+                <span>🔍 Active Pipeline Item Inspector</span>
+              </div>
+              <div style="font-size: 0.75rem; color: var(--accent-cyan);">
+                Real-Time Data Feed
+              </div>
             </div>
-            <div class="palette-items">
-              <div class="palette-item agent" draggable="true" data-type="agent" title="Autonomous Agent with Role, Backstory & LLM">
-                <div class="palette-icon">🤖</div>
-                <div class="palette-item-content">
-                  <div class="palette-item-name">Agent Node</div>
-                  <div class="palette-item-desc">Role, Goal, LLM, Memory, Tools</div>
+
+            <div class="inspector-meta">
+              <div class="inspector-title" id="inspector_title">Waiting for pipeline activity...</div>
+              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <span class="inspector-source-pill" id="inspector_engine" style="border-color: var(--border-violet); color: var(--accent-violet); background: rgba(139, 92, 246, 0.12);">Active Engine: Offline Linguistic Critic</span>
+                <span class="inspector-source-pill" id="inspector_source">Source: Offline Archive</span>
+              </div>
+            </div>
+
+            <!-- Text comparison -->
+            <div class="text-comparison-grid">
+              <div class="text-pane">
+                <div class="pane-label">
+                  <span>Raw Harvested Text</span>
+                  <span style="color: var(--accent-rose);">Pre-cleaning</span>
                 </div>
+                <div class="text-scroll-box" id="raw_text_pane">
+                  Click [ ▶ Resume Pipeline ] or [ ⏭ Step ] to begin autonomous harvesting.
+                </div>
+              </div>
+
+              <div class="text-pane">
+                <div class="pane-label">
+                  <span>Cleaned & Normalized Text</span>
+                  <span style="color: var(--accent-emerald);">Enforced UTF-8</span>
+                </div>
+                <div class="text-scroll-box" id="cleaned_text_pane">
+                  Normalized Malayalam text with atomic Chillus and redacted PII will display here.
+                </div>
+              </div>
+            </div>
+
+            <!-- Gauges Strip -->
+            <div class="inspector-gauges-strip">
+              <div class="gauge-item">
+                <span class="gauge-label">Malayalam Density</span>
+                <span class="gauge-value pass" id="gauge_density">--%</span>
+              </div>
+              <div class="gauge-item">
+                <span class="gauge-label">Fluency Score</span>
+                <span class="gauge-value pass" id="gauge_fluency">--%</span>
+              </div>
+              <div class="gauge-item">
+                <span class="gauge-label">Atomic Chillus Fixed</span>
+                <span class="gauge-value" id="badge_chillu_fixes">0</span>
+              </div>
+              <div class="gauge-item">
+                <span class="gauge-label">PII Redacted</span>
+                <span class="gauge-value" id="badge_pii_redacted">0</span>
               </div>
             </div>
           </div>
 
-          <!-- Category 2: Tasks -->
-          <div class="palette-category-group" data-category="tasks">
-            <div class="palette-category-header">
-              <span class="cat-title">⚡ Tasks</span>
-              <span class="cat-count" id="cat_tasks_count">1</span>
-            </div>
-            <div class="palette-items">
-              <div class="palette-item task" draggable="true" data-type="task" title="Execution Task with Description & Output File">
-                <div class="palette-icon">⚡</div>
-                <div class="palette-item-content">
-                  <div class="palette-item-name">Task Node</div>
-                  <div class="palette-item-desc">Prompt, Expected Output, Agent</div>
-                </div>
+          <!-- Right: Live Terminal & Event Stream -->
+          <div class="terminal-card">
+            <div class="panel-header">
+              <div class="panel-title">
+                <span>📟 Live Event Stream</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 0.72rem; color: var(--text-dim);">Auto-Scroll ON</span>
+                <button class="btn-step" style="padding: 2px 8px; font-size: 0.7rem;" onclick="document.getElementById('terminal_window').innerHTML=''">Clear</button>
               </div>
             </div>
-          </div>
 
-          <!-- Category 3: Tools -->
-          <div class="palette-category-group" data-category="tools">
-            <div class="palette-category-header">
-              <span class="cat-title">🛠️ Tools</span>
-              <span class="cat-count" id="cat_tools_count">5</span>
-            </div>
-            <div class="palette-items">
-              <div class="palette-item tool" draggable="true" data-type="tool" data-tool-type="SerperDevTool" title="Google Real-Time Web Search">
-                <div class="palette-icon">🔍</div>
-                <div class="palette-item-content">
-                  <div class="palette-item-name">Google Search (Serper)</div>
-                  <div class="palette-item-desc">Real-time web search integration</div>
-                </div>
+            <div class="terminal-window" id="terminal_window">
+              <div class="log-entry">
+                <span class="log-time">[Init]</span>
+                <span class="log-level SUCCESS">READY</span>
+                <span class="log-msg">malayaLLM v2.3.0 Engine Loaded. 100% Offline Capable. Ready for execution.</span>
               </div>
-              <div class="palette-item tool" draggable="true" data-type="tool" data-tool-type="ScrapeWebsiteTool" title="Web Page Scraper">
-                <div class="palette-icon">🌐</div>
-                <div class="palette-item-content">
-                  <div class="palette-item-name">Website Scraper</div>
-                  <div class="palette-item-desc">Extracts markdown & HTML from URLs</div>
-                </div>
-              </div>
-              <div class="palette-item tool" draggable="true" data-type="tool" data-tool-type="FileReadTool" title="Local File Reader">
-                <div class="palette-icon">📄</div>
-                <div class="palette-item-content">
-                  <div class="palette-item-name">File Reader</div>
-                  <div class="palette-item-desc">Read code, txt, markdown files</div>
-                </div>
-              </div>
-              <div class="palette-item tool" draggable="true" data-type="tool" data-tool-type="DirectoryReadTool" title="Directory Reader">
-                <div class="palette-icon">📁</div>
-                <div class="palette-item-content">
-                  <div class="palette-item-name">Directory Reader</div>
-                  <div class="palette-item-desc">Browse local directory contents</div>
-                </div>
-              </div>
-              <div class="palette-item tool" draggable="true" data-type="tool" data-tool-type="CustomPythonTool" title="Custom Python Function">
-                <div class="palette-icon">⚙️</div>
-                <div class="palette-item-content">
-                  <div class="palette-item-name">Custom Python Tool</div>
-                  <div class="palette-item-desc">Decorated @tool Python code</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Category 4: Crew Config -->
-          <div class="palette-category-group" data-category="crew">
-            <div class="palette-category-header">
-              <span class="cat-title">👥 Crew Orchestration</span>
-              <span class="cat-count">1</span>
-            </div>
-            <div class="palette-items">
-              <div class="palette-item crew" draggable="true" data-type="crew" title="Crew Configuration & Process Execution">
-                <div class="palette-icon">👥</div>
-                <div class="palette-item-content">
-                  <div class="palette-item-name">Crew Config Node</div>
-                  <div class="palette-item-desc">Sequential vs Hierarchical, RPM, Cache</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Category 5: Presets -->
-          <div class="palette-category-group" data-category="presets">
-            <div class="palette-category-header">
-              <span class="cat-title">📦 Workflow Presets</span>
-            </div>
-            <div class="palette-templates-box">
-              <select class="template-select" id="template_selector">
-                <option value="malayalam_corpus_pipeline">🌴 Malayalam Corpus Builder & Trainer</option>
-                <option value="offline_ollama">🔒 100% Offline Ollama Crew</option>
-                <option value="market_research">📊 Market Research Crew</option>
-                <option value="code_security_audit">🛡️ Code & Security Audit</option>
-              </select>
             </div>
           </div>
 
         </div>
 
-        <!-- Sidebar Footer Status -->
-        <div class="sidebar-footer">
-          <div class="ollama-status-indicator" id="sidebar_ollama_status" title="Local Ollama Status">
-            <span class="status-indicator-dot"></span>
-            <span class="ollama-status-label">Ollama: Scanning</span>
-          </div>
-        </div>
-      </aside>
-
-      <!-- Center Interactive Canvas Viewport -->
-      <section class="canvas-container" id="canvas_container">
-        <!-- High-Contrast Light Grid -->
-        <div class="canvas-grid"></div>
-
-        <!-- Transformable World with Nodes and SVG Layer -->
-        <div class="canvas-world" id="canvas_world">
-          <svg class="connections-layer" id="connections_layer"></svg>
-        </div>
-
-        <!-- Floating Zoom & Canvas Controls -->
-        <div class="canvas-controls">
-          <button class="control-btn" id="btn_zoom_out" title="Zoom Out">−</button>
-          <span class="zoom-indicator" id="zoom_display">100%</span>
-          <button class="control-btn" id="btn_zoom_in" title="Zoom In">+</button>
-        </div>
-
-        <!-- MiniMap -->
-        <div class="minimap-wrapper" title="Click or drag to navigate canvas">
-          <canvas class="minimap-canvas" id="minimap_canvas"></canvas>
-        </div>
       </section>
 
-      <!-- Right Node Property Inspector Drawer -->
-      <aside class="inspector-sidebar collapsed" id="inspector_sidebar">
-        <div class="inspector-header">
-          <div class="inspector-title">
-            <span>⚙️</span>
-            <span>Node Inspector</span>
+
+      <!-- ================================================================== -->
+      <!-- TAB 2: DATASET REVIEW QUEUE                                        -->
+      <!-- ================================================================== -->
+      <section class="tab-pane" id="tab_review">
+        
+        <!-- Review Toolbar -->
+        <div class="review-toolbar">
+          <div class="filter-group">
+            <button class="btn-filter active" data-filter="pending_approval">
+              Pending Approval
+            </button>
+            <button class="btn-filter" data-filter="auto_approved">
+              Auto-Approved (≥85%)
+            </button>
+            <button class="btn-filter" data-filter="approved">
+              All Approved
+            </button>
+            <button class="btn-filter" data-filter="rejected">
+              Rejected
+            </button>
+            <button class="btn-filter" data-filter="all">
+              All Items
+            </button>
           </div>
-          <button class="node-btn close-inspector-btn" title="Close Drawer">✕</button>
+
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <button class="btn-primary" id="btn_auto_proofread_gemma" style="background: linear-gradient(135deg, #8B5CF6, #06B6D4); font-size: 0.8rem;" title="Pass all pending items through Gemma 4: Auto-approves >=85%, keeps <85% in HITL">
+              <span>🤖</span> Gemma Proofread & Auto-Approve
+            </button>
+            <button class="btn-secondary" id="btn_seed_demo" title="Generate fresh diverse Malayalam records">
+              <span>🌱</span> Seed Demo
+            </button>
+            <button class="btn-primary" id="btn_approve_all" style="background: linear-gradient(135deg, #10B981, #059669); font-size: 0.8rem;">
+              <span>✓</span> Approve High Fluency
+            </button>
+          </div>
         </div>
-        <div class="inspector-body">
-          <!-- Populated dynamically by inspector.js -->
+
+        <!-- Cards List -->
+        <div class="review-cards-list" id="review_cards_container">
+          <div style="text-align: center; padding: 2rem; color: var(--text-dim);">
+            Loading review queue...
+          </div>
         </div>
-      </aside>
+
+      </section>
+
+
+      <!-- ================================================================== -->
+      <!-- TAB 3: KEY ROTATOR & CREDENTIALS                                   -->
+      <!-- ================================================================== -->
+      <section class="tab-pane" id="tab_keys">
+        
+        <div class="pipeline-diagram-card" style="margin-bottom: 1.5rem;">
+          <div class="diagram-title" style="margin-bottom: 8px;">
+            <span>🔑 Multi-Key Fallback & Rotation Engine</span>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6;">
+            Add multiple keys per provider for round-robin rotation. When any provider hits HTTP 429 rate-limits or quota limits, the engine instantly hot-swaps to the next key without crashing active pipeline loops. If all cloud keys are exhausted, it automatically cascades to local Ollama and the linguistic critic.
+          </p>
+        </div>
+
+        <div class="keys-grid">
+          
+          <!-- Groq -->
+          <div class="provider-card">
+            <div class="provider-card-header">
+              <div class="provider-name-box">
+                <span style="font-size: 1.3rem;">⚡</span>
+                <span class="provider-title">Groq Cloud (Llama-3.3-70B)</span>
+              </div>
+              <span class="provider-pool-badge" id="badge_groq_keys">0 Active</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">API Keys (Comma or Newline separated for pooling):</label>
+              <textarea class="key-textarea" id="input_key_groq" placeholder="gsk_..."></textarea>
+            </div>
+            <div class="provider-actions">
+              <button class="btn-test-key" data-provider="groq">Test Connection</button>
+              <button class="btn-save-key" data-provider="groq">Save Keys</button>
+            </div>
+          </div>
+
+          <!-- Google Gemini -->
+          <div class="provider-card">
+            <div class="provider-card-header">
+              <div class="provider-name-box">
+                <span style="font-size: 1.3rem;">✨</span>
+                <span class="provider-title">Google Gemini (2.0 Flash)</span>
+              </div>
+              <span class="provider-pool-badge" id="badge_gemini_keys">0 Active</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">API Keys (Gemini API keys pool):</label>
+              <textarea class="key-textarea" id="input_key_gemini" placeholder="AIzaSy..."></textarea>
+            </div>
+            <div class="provider-actions">
+              <button class="btn-test-key" data-provider="gemini">Test Connection</button>
+              <button class="btn-save-key" data-provider="gemini">Save Keys</button>
+            </div>
+          </div>
+
+          <!-- OpenRouter -->
+          <div class="provider-card">
+            <div class="provider-card-header">
+              <div class="provider-name-box">
+                <span style="font-size: 1.3rem;">🌐</span>
+                <span class="provider-title">OpenRouter</span>
+              </div>
+              <span class="provider-pool-badge" id="badge_openrouter_keys">0 Active</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">API Keys:</label>
+              <textarea class="key-textarea" id="input_key_openrouter" placeholder="sk-or-..."></textarea>
+            </div>
+            <div class="provider-actions">
+              <button class="btn-test-key" data-provider="openrouter">Test Connection</button>
+              <button class="btn-save-key" data-provider="openrouter">Save Keys</button>
+            </div>
+          </div>
+
+          <!-- NVIDIA NIM -->
+          <div class="provider-card">
+            <div class="provider-card-header">
+              <div class="provider-name-box">
+                <span style="font-size: 1.3rem;">🟢</span>
+                <span class="provider-title">NVIDIA NIM</span>
+              </div>
+              <span class="provider-pool-badge" id="badge_nvidia_keys">0 Active</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">API Keys:</label>
+              <textarea class="key-textarea" id="input_key_nvidia" placeholder="nvapi-..."></textarea>
+            </div>
+            <div class="provider-actions">
+              <button class="btn-test-key" data-provider="nvidia">Test Connection</button>
+              <button class="btn-save-key" data-provider="nvidia">Save Keys</button>
+            </div>
+          </div>
+
+          <!-- Local Ollama (100% Offline) -->
+          <div class="provider-card" style="border-color: rgba(6, 182, 212, 0.4);">
+            <div class="provider-card-header">
+              <div class="provider-name-box">
+                <span style="font-size: 1.3rem;">🦙</span>
+                <span class="provider-title">Local Ollama (100% Offline)</span>
+              </div>
+              <span class="provider-pool-badge" style="background: rgba(6, 182, 212, 0.2); color: var(--accent-cyan);">Air-Gapped Ready</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Ollama Host Endpoint:</label>
+              <input type="text" class="key-textarea" id="input_ollama_endpoint" style="min-height: 38px;" value="http://localhost:11434">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Target Model Name:</label>
+              <input type="text" class="key-textarea" id="input_ollama_model" style="min-height: 38px;" value="llama3.2">
+            </div>
+            <div class="provider-actions">
+              <button class="btn-test-key" data-provider="ollama">Scan Ollama</button>
+              <button class="btn-save-key" id="btn_save_ollama" style="background: var(--accent-emerald);">Update Config</button>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ================================================================== -->
+      <!-- TAB 4: TRAINING EXPORTER & GOOGLE COLAB BRIDGE                     -->
+      <!-- ================================================================== -->
+      <section class="tab-pane" id="tab_colab">
+        
+        <div class="training-layout">
+          
+          <!-- Left: Export Card -->
+          <div class="export-summary-card">
+            <div class="diagram-title" style="margin-bottom: 1rem;">
+              <span>📦 Dataset Staging & Handoff</span>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1.5rem;">
+              Approved batches in the Human Review Queue are bundled into structured formats ready for pre-training or instruction tuning.
+            </p>
+
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 1.5rem;">
+              <div class="inspector-gauges-strip">
+                <span>Format:</span>
+                <span style="font-family: var(--font-mono); color: var(--accent-cyan);">JSONL (ChatML Alpaca)</span>
+              </div>
+              <div class="inspector-gauges-strip">
+                <span>Encoding:</span>
+                <span style="font-family: var(--font-mono); color: var(--accent-emerald);">UTF-8 (Zero Mojibake)</span>
+              </div>
+              <div class="inspector-gauges-strip">
+                <span>Storage Path:</span>
+                <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-dim);">data/approved_training/</span>
+              </div>
+            </div>
+
+            <button class="btn-primary" onclick="dashboard.triggerExport()" style="width: 100%; justify-content: center; margin-bottom: 12px;">
+              <span>📥</span> Generate & Export Training Bundle
+            </button>
+
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
+              <a href="/api/export/download/unified" class="download-link-btn btn-secondary" style="justify-content: center; background: rgba(6, 182, 212, 0.12); border-color: rgba(6, 182, 212, 0.4); color: var(--accent-cyan);" download>
+                <span>📦</span> Download Unified Dataset (.jsonl)
+              </a>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <a href="/api/export/download/train" class="download-link-btn btn-secondary" style="justify-content: center; font-size: 0.75rem;" download>
+                  <span>🚂</span> Train Split (90%)
+                </a>
+                <a href="/api/export/download/val" class="download-link-btn btn-secondary" style="justify-content: center; font-size: 0.75rem;" download>
+                  <span>🧪</span> Val Split (10%)
+                </a>
+              </div>
+              <a href="/api/export/download/manifest" class="download-link-btn btn-secondary" style="justify-content: center; font-size: 0.75rem;" download>
+                <span>📄</span> Dataset Manifest (.json)
+              </a>
+            </div>
+
+            <button class="btn-secondary" id="btn_copy_colab" style="width: 100%; justify-content: center;">
+              <span>📋</span> Copy Colab Unsloth Script
+            </button>
+          </div>
+
+          <!-- Right: Code Viewer -->
+          <div class="colab-script-card">
+            <div class="panel-header">
+              <div class="panel-title">
+                <span>🐍 Google Colab Turnkey QLoRA Script (Unsloth + Drive Relay)</span>
+              </div>
+              <span style="font-size: 0.75rem; color: var(--accent-emerald);">
+                Auto Checkpoint Relay (50 steps)
+              </span>
+            </div>
+
+            <div class="code-viewer-container" id="colab_script_viewer">
+              Loading script...
+            </div>
+          </div>
+
+        </div>
+
+      </section>
 
     </main>
 
-    <!-- Bottom Docked Console: Code Exporter, CLI Assistant, and Diagnostics -->
-    <footer class="code-drawer" id="code_drawer">
-      <div class="code-drawer-header">
-        <div class="code-tabs">
-          <button class="code-tab active" data-tab="native">
-            <span>📁 Native CrewAI (YAML)</span>
-          </button>
-          <button class="code-tab" data-tab="single">
-            <span>🐍 Executable Script (crew_runner.py)</span>
-          </button>
-          <button class="code-tab" data-tab="env">
-            <span>🔑 Environment (.env)</span>
-          </button>
-          <button class="code-tab" data-tab="reqs">
-            <span>📦 requirements.txt</span>
-          </button>
-          <button class="code-tab" data-tab="cli">
-            <span>💻 Terminal CLI Wizard</span>
-          </button>
-          <button class="code-tab" data-tab="diagnostics">
-            <span>🩺 Diagnostics Console</span>
-          </button>
-          <button class="code-tab" data-tab="dataset_review" id="tab_dataset_review">
-            <span>📋 Dataset Review Queue</span>
-            <span class="badge-count warning" id="dock_pending_badge" style="display: none;">0</span>
-          </button>
-          <button class="code-tab" data-tab="colab_bridge" id="tab_colab_bridge">
-            <span>🚀 Colab Training Bridge</span>
-          </button>
-        </div>
-
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <button class="btn btn-ghost btn-sm" id="copy_code_btn" title="Copy Current Code to Clipboard">
-            📋 Copy
-          </button>
-          <button class="btn btn-ghost btn-sm" id="download_file_btn" title="Download Current File">
-            💾 Download File
-          </button>
-          <button class="btn btn-ghost btn-sm" id="toggle_drawer_btn" title="Toggle Dock Height">
-            ▼ Minimize
-          </button>
-        </div>
+    <!-- Footer Status Banner -->
+    <footer style="padding: 0.75rem 1.5rem; background: rgba(10, 15, 26, 0.9); border-top: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; font-size: 0.75rem; color: var(--text-dim);">
+      <div>
+        malayaLLM v2.3.0 • Pure Python Modular Engine • 100% Offline Capable • UTF-8 Strict
       </div>
-
-      <!-- Sub-file Selector for Native CrewAI Project Structure -->
-      <div class="sub-file-selector" id="sub_file_bar">
-        <span style="font-size: 0.72rem; color: var(--text-dim); margin-right: 6px;">Active File:</span>
-        <button class="sub-file-pill active" data-file="agents.yaml">config/agents.yaml</button>
-        <button class="sub-file-pill" data-file="tasks.yaml">config/tasks.yaml</button>
-        <button class="sub-file-pill" data-file="crew.py">crew.py</button>
-        <button class="sub-file-pill" data-file="main.py">main.py</button>
-      </div>
-
-      <!-- Code Highlighting View Container -->
-      <div class="code-view-container" id="code_view_wrapper">
-        <pre class="code-pre"><code id="code_content" class="language-python"># Real-time code preview loading...</code></pre>
-      </div>
-
-      <!-- Embedded CLI Wizard View Container -->
-      <div class="dock-tab-panel" id="cli_tab_panel" style="display: none;">
-        <!-- Populated dynamically -->
-      </div>
-
-      <!-- Embedded Diagnostics View Container -->
-      <div class="dock-tab-panel" id="diagnostics_tab_panel" style="display: none;">
-        <!-- Populated dynamically -->
-      </div>
-
-      <!-- Embedded Dataset Review Queue View Container -->
-      <div class="dock-tab-panel" id="dataset_review_panel" style="display: none; padding: 0;">
-        <!-- Populated dynamically by dataset-review.js -->
-      </div>
-
-      <!-- Embedded Colab Training Bridge View Container -->
-      <div class="dock-tab-panel" id="colab_bridge_panel" style="display: none;">
-        <!-- Populated dynamically -->
+      <div>
+        <a href="/api/health" target="_blank" style="color: var(--accent-cyan); text-decoration: none;">API Health</a>
+        <span style="margin: 0 8px;">•</span>
+        <a href="/api/pipeline/status" target="_blank" style="color: var(--accent-emerald); text-decoration: none;">Live Status JSON</a>
       </div>
     </footer>
 
-    <!-- UNIFIED MODAL: LLM Providers, Models & Live Key Vault -->
-    <div class="modal-backdrop" id="vault_modal">
-      <div class="modal-card vault-card">
-        <div class="modal-header">
-          <div class="modal-title">
-            <span>🔑</span>
-            <span>LLM Providers, Models & Live Key Vault</span>
-          </div>
-          <button class="node-btn close-vault-btn">✕</button>
-        </div>
-        <div class="modal-body vault-body">
-          
-          <!-- Local Ollama Integration Section -->
-          <div class="vault-section">
-            <div class="vault-section-header">
-              <div class="vault-section-title">
-                <span class="provider-icon">🦙</span>
-                <span>Local Ollama Integration</span>
-              </div>
-              <div class="ollama-live-badge" id="vault_ollama_badge">
-                <span class="status-dot"></span>
-                <span id="vault_ollama_status_text">Checking...</span>
-              </div>
-            </div>
-
-            <div class="ollama-action-row">
-              <span class="ollama-desc">Direct auto-discovery on <code>http://localhost:11434</code>. Discovered models automatically populate node LLM dropdowns.</span>
-              <button class="btn btn-secondary btn-sm" id="btn_scan_ollama">
-                🔄 Scan / Re-check Models
-              </button>
-            </div>
-
-            <!-- Discovered Models Chips -->
-            <div class="discovered-models-container" id="discovered_models_list">
-              <!-- Dynamically populated -->
-            </div>
-          </div>
-
-          <div class="vault-divider"></div>
-
-          <!-- Cloud API Keys Section -->
-          <div class="vault-section">
-            <div class="vault-section-header">
-              <div class="vault-section-title">
-                <span class="provider-icon">☁️</span>
-                <span>Cloud LLM & Search API Keys</span>
-              </div>
-              <span class="vault-section-hint">Stored locally in your browser. Auto-populates into <code>.env</code>.</span>
-            </div>
-
-            <div class="key-inputs-grid" id="cloud_keys_grid">
-              <!-- Dynamically generated for OpenAI, Anthropic, Gemini, Groq, Serper -->
-            </div>
-          </div>
-
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-ghost btn-sm" id="btn_clear_keys">Clear All Keys</button>
-          <button class="btn btn-primary btn-sm" id="btn_save_vault">Save & Sync to .env</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Standalone CLI Wizard Modal (also accessible from dock) -->
-    <div class="modal-backdrop" id="cli_modal">
-      <div class="modal-card">
-        <div class="modal-header">
-          <div class="modal-title">
-            <span>💻</span>
-            <span>Direct CLI & Terminal Integration Assistant</span>
-          </div>
-          <button class="node-btn close-modal-btn">✕</button>
-        </div>
-        <div class="modal-body">
-          <!-- Populated by cli-wizard.js -->
-        </div>
-      </div>
-    </div>
-
-    <!-- Toast Notification Container -->
-    <div class="toast-container" id="toast_container"></div>
-
   </div>
 
-  <!-- Offline bundled dependencies -->
-  <script src="assets/jszip.min.js"></script>
-  <script src="assets/prism.min.js"></script>
-  <script src="assets/prism-python.min.js"></script>
-  <script src="assets/prism-yaml.min.js"></script>
-  <script src="assets/prism-bash.min.js"></script>
-
-  <!-- Main ES Module Application -->
-  <script type="module" src="js/app.js"></script>
+  <!-- Operations Center ES6 Client Script -->
+  <script src="js/dashboard.js"></script>
 </body>
 </html>

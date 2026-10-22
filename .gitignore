@@ -34,5 +34,8 @@ env/
 .DS_Store
 Thumbs.db
 
-# Logs
+# Logs & SQLite database files
 *.log
+*.db
+*.db-wal
+*.db-shm

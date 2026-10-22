@@ -9,6 +9,42 @@
 
 <!-- AUTO_CHANGELOG_START -->
 
+## [STAGE-007] v2.3.0 — Autonomous, Lightweight Modular Malayalam Data Pipeline & Operations Center
+*Recorded: 2026-10-22 11:05:00 UTC* • **Status: COMPLETED**
+
+### 1. Business Requirement & User Story
+- **Business Need**: Replace heavy agent framework dependencies with a high-performance, pure Python modular backend engine and a responsive, zero-bloat vanilla ES6 web Operations Center. Provide 100% offline capability (via local Ollama daemon and deterministic linguistic heuristics) alongside multi-provider API key rotation (Groq, Gemini, OpenRouter, NVIDIA NIM) with automatic HTTP 429 hot-swap error handling, continuous autonomous harvesting, morphological cleaning, and human-in-the-loop review.
+- **User Story**: As an NLP researcher and ML engineer curating low-resource Dravidian datasets, I want an autonomous, zero-bloat pipeline running on pure Python and SQLite WAL ledger with real-time Play/Pause/Step controls, side-by-side text inspection, Unicode density gating, and instant export to Google Colab QLoRA scripts, so that I can reliably curate high-quality Malayalam corpora in both air-gapped and cloud environments.
+
+### 2. Development Implementation Summary
+- **SQLite Job State & Ledger (`backend/db.py`)**: Designed `pipeline_state.db` tracking run states, iteration counts, stage statuses, event logs, live item streaming, and the Human Review Queue with automatic seeding.
+- **Multi-Key Fallback & Rotation Engine (`backend/key_rotator.py`)**: Built credential manager with round-robin pooling, 429 rate-limit backoff cooldowns, persistent vault storage (`data/keys_vault.json`), and cascade failover across Groq, Gemini, OpenRouter, NVIDIA NIM, and local Ollama (`http://localhost:11434`).
+- **Decoupled Modular Python Pipeline (`backend/pipeline_engine.py` & `workers/*`)**:
+  - `workers/ingestor.py`: Standalone non-blocking harvester reading from local files, Malayalam RSS feeds, and offline Dravidian archives.
+  - `workers/normalizer.py`: Morphological cleaner enforcing NFKC normalization, atomic Chillu standardization (ൺ, ൻ, ർ, ൽ, ൾ, ൿ), HTML/URL stripping, Indian PII redaction, and ≥60% Malayalam Unicode density gating (`\u0D00-\u0D7F`).
+  - `workers/judge.py`: Quality judge using rotating LLMs with fallback to deterministic Dravidian linguistic critic to evaluate syntax and drop machine translationese.
+  - `workers/exporter.py`: Bundles approved items into JSONL, structured JSON, and Google Colab Unsloth QLoRA training script with Google Drive 50-step checkpoint relay loop.
+- **FastAPI Operations Center Server (`server.py`)**: REST endpoints (`/api/pipeline/start`, `/api/pipeline/pause`, `/api/pipeline/step`, `/api/pipeline/status`, `/api/queue/review`, `/api/queue/action`, `/api/keys`, `/api/export/trigger`, `/api/health`).
+- **Web Operations Center UI (`index.html`, `js/dashboard.js`, `css/operations.css`)**: Master Play/Pause control with real-time state sync, visual 4-node animated diagram with pulsing status rings and stage progress bars, live side-by-side item inspector with density gauges, and interactive Human Review Queue.
+
+### 3. Impact on System Architecture & Process Flows
+- **Architectural Impact**: Eliminates framework bloat in favor of a clean, decoupled Python worker architecture with SQLite WAL persistence, strict UTF-8 enforcement across all I/O to eliminate Malayalam Mojibake, and instant Google Colab fine-tuning handoff.
+- **Files Modified/Created**:
+  - `backend/db.py`
+  - `backend/key_rotator.py`
+  - `backend/pipeline_engine.py`
+  - `workers/ingestor.py`
+  - `workers/normalizer.py`
+  - `workers/judge.py`
+  - `workers/exporter.py`
+  - `server.py`
+  - `index.html`
+  - `css/operations.css`
+  - `js/dashboard.js`
+  - `docs/CHANGELOG_REQUIREMENTS.md`
+
+---
+
 ## [STAGE-006] v2.2.0 — Malayalam End-to-End Autonomous Scraping, Human-Approval & Colab Training Pipeline
 *Recorded: 2026-10-22 10:47:23 UTC* • **Status: COMPLETED**
 

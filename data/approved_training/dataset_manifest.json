@@ -1,0 +1,21 @@
+{
+  "name": "malayaLLM Malayalam Instruction Fine-Tuning Corpus",
+  "version": "2.3.0",
+  "exported_at": "20261022_152757",
+  "total_records": 16,
+  "train_records": 14,
+  "validation_records": 2,
+  "total_characters": 5431,
+  "avg_density": 0.877,
+  "avg_fluency": 0.991,
+  "format": "JSONL (ChatML and Alpaca compatible)",
+  "files": {
+    "unified": "malayalam_dataset_unified.jsonl",
+    "train": "train.jsonl",
+    "validation": "val.jsonl",
+    "legacy_train": "malayalam_instruct_train.jsonl",
+    "colab_script": "colab_qlora_unsloth.py"
+  },
+  "unsloth_compatible": true,
+  "qlora_ready": true
+}
