@@ -1,0 +1,60 @@
+{
+  "id": "batch_mal_tech_001",
+  "name": "Regional Tech & AI Science Articles (Mathrubhumi & Tech Kerala)",
+  "source": "https://mathrubhumi.com/technology",
+  "timestamp": "2026-10-22 10:15:00",
+  "status": "pending_approval",
+  "total_records": 3,
+  "avg_density": 0.805,
+  "avg_fluency": 1.0,
+  "items": [
+    {
+      "id": "item_tech_01",
+      "title": "നിർമ്മിത ബുദ്ധിയും പ്രാദേശിക ഭാഷകളും",
+      "raw_text": "<div class='news-content'>നിർമ്മിത ബുദ്ധിയുടെ (AI) പുതിയ മുന്നേറ്റങ്ങൾ മലയാള ഭാഷാ സാങ്കേതികവിദ്യയെ പുതിയ ഉയരങ്ങളിലേക്ക് നയിക്കുന്നു. <p>കൂടുതൽ വിവരങ്ങൾക്ക് ബന്ധപ്പെടുക: contact@malayalam-ai.org അല്ലെങ്കിൽ ഫോൺ: +91-9847012345</p>. ഇന്റർനെറ്റിലെ ഡാറ്റ പരിശോധിക്കുമ്പോൾ ശാസ്ത്രീയമായ രീതിയിൽ അക്ഷരപ്പിശകുകൾ തിരുത്താൻ നല്&zwj;കണം.</div>",
+      "cleaned_text": "നിർമ്മിത ബുദ്ധിയുടെ (AI) പുതിയ മുന്നേറ്റങ്ങൾ മലയാള ഭാഷാ സാങ്കേതികവിദ്യയെ പുതിയ ഉയരങ്ങളിലേക്ക് നയിക്കുന്നു. കൂടുതൽ വിവരങ്ങൾക്ക് ബന്ധപ്പെടുക: [EMAIL_REDACTED] അല്ലെങ്കിൽ ഫോൺ: [PHONE_REDACTED] . ഇന്റർനെറ്റിലെ ഡാറ്റ പരിശോധിക്കുമ്പോൾ ശാസ്ത്രീയമായ രീതിയിൽ അക്ഷരപ്പിശകുകൾ തിരുത്താൻ നൽകണം.",
+      "malayalam_density": 0.8392,
+      "density_passed": true,
+      "chillu_fixes": 1,
+      "pii_redacted": 2,
+      "fluency_score": 1.0,
+      "quality_rating": "High Quality (Native Fluency)",
+      "passed_validation": true,
+      "audit_notes": [
+        "High morphological consistency and valid syntax"
+      ]
+    },
+    {
+      "id": "item_tech_02",
+      "title": "ഓപ്പൺ സോഴ്സ് മലയാളം കമ്പ്യൂട്ടിംഗ്",
+      "raw_text": "സ്വതന്ത്ര മലയാളം കമ്പ്യൂട്ടിംഗ് (SMC) കൂട്ടായ്മ മലയാളം അക്ഷരക്കൂട്ടങ്ങൾക്കും ഡിജിറ്റൽ ഫോണ്ടുകൾക്കും വേണ്ടി സ്തുത്യർഹമായ പ്രവർത്തനങ്ങൾ നടത്തിവരുന്നു. യൂണിക്&zwj;കോഡ് മാനദണ്ഡങ്ങൾ പാലിക്കുന്നതിലൂടെ ഏത് ഉപകരണത്തിലും മലയാളം കൃത്യമായി വായിക്കാൻ സാധിക്കും. <span>Ref: info@smc.org.in</span>",
+      "cleaned_text": "സ്വതന്ത്ര മലയാളം കമ്പ്യൂട്ടിംഗ് (SMC) കൂട്ടായ്മ മലയാളം അക്ഷരക്കൂട്ടങ്ങൾക്കും ഡിജിറ്റൽ ഫോണ്ടുകൾക്കും വേണ്ടി സ്തുത്യർഹമായ പ്രവർത്തനങ്ങൾ നടത്തിവരുന്നു. യൂണിൿകോഡ് മാനദണ്ഡങ്ങൾ പാലിക്കുന്നതിലൂടെ ഏത് ഉപകരണത്തിലും മലയാളം കൃത്യമായി വായിക്കാൻ സാധിക്കും. Ref: [EMAIL_REDACTED]",
+      "malayalam_density": 0.8884,
+      "density_passed": true,
+      "chillu_fixes": 1,
+      "pii_redacted": 1,
+      "fluency_score": 1.0,
+      "quality_rating": "High Quality (Native Fluency)",
+      "passed_validation": true,
+      "audit_notes": [
+        "High morphological consistency and valid syntax"
+      ]
+    },
+    {
+      "id": "item_tech_03",
+      "title": "മെഷീൻ ട്രാൻസ്ലേഷൻ പരിമിതികൾ",
+      "raw_text": "<article>പലപ്പോഴും യാന്ത്രിക വിവർത്തനങ്ങൾ (Machine Translation) കൃത്യതയുള്ളതല്ല ആകുന്നു. വ്യാകരണപരമായ അബദ്ധങ്ങൾ ഒഴിവാക്കുന്നതിനായി വലിയ തോതിലുള്ള മലയാളം കോർപ്പസ് ഡാറ്റ ആവശ്യമുണ്ട്. Aadhaar: 1234 5678 9012 verification.</article>",
+      "cleaned_text": "പലപ്പോഴും യാന്ത്രിക വിവർത്തനങ്ങൾ (Machine Translation) കൃത്യതയുള്ളതല്ല ആകുന്നു. വ്യാകരണപരമായ അബദ്ധങ്ങൾ ഒഴിവാക്കുന്നതിനായി വലിയ തോതിലുള്ള മലയാളം കോർപ്പസ് ഡാറ്റ ആവശ്യമുണ്ട്. Aadhaar: [AADHAAR_REDACTED] verification.",
+      "malayalam_density": 0.6872,
+      "density_passed": true,
+      "chillu_fixes": 0,
+      "pii_redacted": 1,
+      "fluency_score": 1.0,
+      "quality_rating": "High Quality (Native Fluency)",
+      "passed_validation": true,
+      "audit_notes": [
+        "High morphological consistency and valid syntax"
+      ]
+    }
+  ]
+}

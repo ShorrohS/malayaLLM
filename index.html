@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CrewAI Operations Center | Visual Agent & Workflow Orchestrator</title>
+  
+  <!-- Modern Geometric Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Prism Syntax Highlighting (Light Theme) -->
+  <link rel="stylesheet" href="assets/prism-light.min.css">
+  
+  <!-- Core Design System -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- Persistent Enterprise Utility Header -->
+    <header class="top-nav">
+      <!-- Left: Branding & Status Badge -->
+      <div class="brand-section">
+        <button class="btn-icon-toggle" id="btn_toggle_sidebar" title="Toggle Components Sidebar (Ctrl+B)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+
+        <div class="logo-icon" title="CrewAI Operations Center">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <div class="brand-text-block">
+          <div class="brand-title">
+            <span>CrewAI</span>
+            <span class="brand-subtitle">Ops Center</span>
+          </div>
+        </div>
+
+        <button class="status-indicator-badge healthy" id="btn_header_status" title="Workspace Health Status">
+          <span class="status-dot"></span>
+          <span id="header_status_text">All Systems Operational</span>
+        </button>
+
+        <span class="active-crew-tag" id="active_crew_pill" title="Active Crew Project">
+          PrivateLocalCrew
+        </span>
+      </div>
+
+      <!-- Center: Action Toolbar (Subtle Segmented Controls with Responsive Overflow) -->
+      <div class="center-toolbar" id="center_toolbar">
+        <div class="toolbar-primary-group" id="toolbar_primary_group">
+          <button class="btn-tool active" id="btn_toggle_snap" title="Toggle 20px Grid Snapping">
+            <span>🧲</span> <span class="tool-label">Snap</span>
+          </button>
+          <button class="btn-tool" id="btn_fit_view" title="Fit All Nodes in View">
+            <span>🔍</span> <span class="tool-label">Fit</span>
+          </button>
+          <button class="btn-tool" id="btn_reset_view" title="Reset Zoom to 100%">
+            <span>🎯</span> <span class="tool-label">100%</span>
+          </button>
+          <div class="toolbar-divider"></div>
+          <button class="btn-tool" id="btn_load_json" title="Open Saved Workflow JSON">
+            <span>📂</span> <span class="tool-label">Load</span>
+          </button>
+          <input type="file" id="load_json_input" accept=".json" style="display: none;">
+          <button class="btn-tool" id="btn_save_json" title="Save Workflow JSON">
+            <span>💾</span> <span class="tool-label">Save</span>
+          </button>
+          <button class="btn-tool" id="btn_clear_canvas" title="Clear Canvas">
+            <span>🗑️</span>
+          </button>
+        </div>
+
+        <!-- Collapsible Overflow Dropdown for Compact Screen Widths -->
+        <div class="toolbar-overflow-container" id="toolbar_overflow_container">
+          <button class="btn-tool overflow-trigger-btn" id="btn_toolbar_overflow" title="More Canvas & File Controls">
+            <span>⚙️</span> <span class="overflow-btn-text">Tools ▾</span>
+          </button>
+          <div class="toolbar-overflow-dropdown" id="toolbar_overflow_dropdown">
+            <button class="overflow-item" id="overflow_snap_grid">
+              <span>🧲</span> <span>Snap to Grid</span>
+            </button>
+            <button class="overflow-item" id="overflow_fit_canvas">
+              <span>🔍</span> <span>Fit View</span>
+            </button>
+            <button class="overflow-item" id="overflow_reset_view">
+              <span>🎯</span> <span>Reset Zoom (100%)</span>
+            </button>
+            <div class="overflow-divider"></div>
+            <button class="overflow-item" id="overflow_load_json">
+              <span>📂</span> <span>Load Workflow JSON</span>
+            </button>
+            <button class="overflow-item" id="overflow_save_json">
+              <span>💾</span> <span>Save Workflow JSON</span>
+            </button>
+            <button class="overflow-item text-danger" id="overflow_clear_canvas">
+              <span>🗑️</span> <span>Clear Canvas</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Health Pill, Key Vault & Primary Action -->
+      <div class="nav-actions">
+        <!-- Persistent Interactive System Health & Connectivity Pill -->
+        <button class="health-pulse-pill" id="btn_health_pill" title="Click to view LLM Providers & Connectivity Diagnostics">
+          <span class="pulse-dot"></span>
+          <span id="health_pill_text">Ollama: Scanning...</span>
+        </button>
+
+        <!-- Live Key Vault Button with Active Count -->
+        <button class="btn btn-secondary btn-sm" id="btn_open_vault" title="Manage Cloud API Keys & Local Ollama Models">
+          <span>🔑</span>
+          <span class="btn-text-full">Key Vault</span>
+          <span class="badge-count" id="vault_key_count">0/5</span>
+        </button>
+
+        <!-- Diagnostics Button -->
+        <button class="btn btn-secondary btn-sm" id="btn_open_diagnostics" title="Open Network & Topology Diagnostics">
+          <span>🩺</span>
+          <span class="btn-text-full">Diagnostics</span>
+          <span class="badge-count warning" id="diag_warning_count" style="display: none;">0</span>
+        </button>
+
+        <!-- Live Dataset Review Queue Button (HITL Approval) -->
+        <button class="btn btn-secondary btn-sm" id="btn_open_review" title="Open Malayalam Dataset Review Queue (Human-in-the-Loop Approval)">
+          <span>📋</span>
+          <span class="btn-text-full">Review Queue</span>
+          <span class="badge-count warning" id="top_pending_badge" style="display: none;">0</span>
+        </button>
+
+        <!-- Primary Action -->
+        <button class="btn btn-primary btn-sm" id="btn_export_zip" title="Package and Download Turnkey CrewAI Project">
+          <span>⚡</span> <span class="btn-text-full">Export ZIP</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Workspace Area -->
+    <main class="main-workspace">
+      
+      <!-- Left Sidebar: Categorized, Search-Filterable Operations Panel -->
+      <aside class="palette-dock" id="palette_dock">
+        <!-- Search Filter Header -->
+        <div class="sidebar-search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="component_search" class="search-input" placeholder="Search components... (Ctrl+K)" autocomplete="off">
+          <button class="search-clear-btn" id="search_clear_btn" style="display: none;">✕</button>
+        </div>
+
+        <!-- Scrollable Accordion Sections -->
+        <div class="sidebar-scroll-container">
+          
+          <!-- Category 1: Agents -->
+          <div class="palette-category-group" data-category="agents">
+            <div class="palette-category-header">
+              <span class="cat-title">🤖 Agents</span>
+              <span class="cat-count" id="cat_agents_count">1</span>
+            </div>
+            <div class="palette-items">
+              <div class="palette-item agent" draggable="true" data-type="agent" title="Autonomous Agent with Role, Backstory & LLM">
+                <div class="palette-icon">🤖</div>
+                <div class="palette-item-content">
+                  <div class="palette-item-name">Agent Node</div>
+                  <div class="palette-item-desc">Role, Goal, LLM, Memory, Tools</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Category 2: Tasks -->
+          <div class="palette-category-group" data-category="tasks">
+            <div class="palette-category-header">
+              <span class="cat-title">⚡ Tasks</span>
+              <span class="cat-count" id="cat_tasks_count">1</span>
+            </div>
+            <div class="palette-items">
+              <div class="palette-item task" draggable="true" data-type="task" title="Execution Task with Description & Output File">
+                <div class="palette-icon">⚡</div>
+                <div class="palette-item-content">
+                  <div class="palette-item-name">Task Node</div>
+                  <div class="palette-item-desc">Prompt, Expected Output, Agent</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Category 3: Tools -->
+          <div class="palette-category-group" data-category="tools">
+            <div class="palette-category-header">
+              <span class="cat-title">🛠️ Tools</span>
+              <span class="cat-count" id="cat_tools_count">5</span>
+            </div>
+            <div class="palette-items">
+              <div class="palette-item tool" draggable="true" data-type="tool" data-tool-type="SerperDevTool" title="Google Real-Time Web Search">
+                <div class="palette-icon">🔍</div>
+                <div class="palette-item-content">
+                  <div class="palette-item-name">Google Search (Serper)</div>
+                  <div class="palette-item-desc">Real-time web search integration</div>
+                </div>
+              </div>
+              <div class="palette-item tool" draggable="true" data-type="tool" data-tool-type="ScrapeWebsiteTool" title="Web Page Scraper">
+                <div class="palette-icon">🌐</div>
+                <div class="palette-item-content">
+                  <div class="palette-item-name">Website Scraper</div>
+                  <div class="palette-item-desc">Extracts markdown & HTML from URLs</div>
+                </div>
+              </div>
+              <div class="palette-item tool" draggable="true" data-type="tool" data-tool-type="FileReadTool" title="Local File Reader">
+                <div class="palette-icon">📄</div>
+                <div class="palette-item-content">
+                  <div class="palette-item-name">File Reader</div>
+                  <div class="palette-item-desc">Read code, txt, markdown files</div>
+                </div>
+              </div>
+              <div class="palette-item tool" draggable="true" data-type="tool" data-tool-type="DirectoryReadTool" title="Directory Reader">
+                <div class="palette-icon">📁</div>
+                <div class="palette-item-content">
+                  <div class="palette-item-name">Directory Reader</div>
+                  <div class="palette-item-desc">Browse local directory contents</div>
+                </div>
+              </div>
+              <div class="palette-item tool" draggable="true" data-type="tool" data-tool-type="CustomPythonTool" title="Custom Python Function">
+                <div class="palette-icon">⚙️</div>
+                <div class="palette-item-content">
+                  <div class="palette-item-name">Custom Python Tool</div>
+                  <div class="palette-item-desc">Decorated @tool Python code</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Category 4: Crew Config -->
+          <div class="palette-category-group" data-category="crew">
+            <div class="palette-category-header">
+              <span class="cat-title">👥 Crew Orchestration</span>
+              <span class="cat-count">1</span>
+            </div>
+            <div class="palette-items">
+              <div class="palette-item crew" draggable="true" data-type="crew" title="Crew Configuration & Process Execution">
+                <div class="palette-icon">👥</div>
+                <div class="palette-item-content">
+                  <div class="palette-item-name">Crew Config Node</div>
+                  <div class="palette-item-desc">Sequential vs Hierarchical, RPM, Cache</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Category 5: Presets -->
+          <div class="palette-category-group" data-category="presets">
+            <div class="palette-category-header">
+              <span class="cat-title">📦 Workflow Presets</span>
+            </div>
+            <div class="palette-templates-box">
+              <select class="template-select" id="template_selector">
+                <option value="malayalam_corpus_pipeline">🌴 Malayalam Corpus Builder & Trainer</option>
+                <option value="offline_ollama">🔒 100% Offline Ollama Crew</option>
+                <option value="market_research">📊 Market Research Crew</option>
+                <option value="code_security_audit">🛡️ Code & Security Audit</option>
+              </select>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Sidebar Footer Status -->
+        <div class="sidebar-footer">
+          <div class="ollama-status-indicator" id="sidebar_ollama_status" title="Local Ollama Status">
+            <span class="status-indicator-dot"></span>
+            <span class="ollama-status-label">Ollama: Scanning</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Center Interactive Canvas Viewport -->
+      <section class="canvas-container" id="canvas_container">
+        <!-- High-Contrast Light Grid -->
+        <div class="canvas-grid"></div>
+
+        <!-- Transformable World with Nodes and SVG Layer -->
+        <div class="canvas-world" id="canvas_world">
+          <svg class="connections-layer" id="connections_layer"></svg>
+        </div>
+
+        <!-- Floating Zoom & Canvas Controls -->
+        <div class="canvas-controls">
+          <button class="control-btn" id="btn_zoom_out" title="Zoom Out">−</button>
+          <span class="zoom-indicator" id="zoom_display">100%</span>
+          <button class="control-btn" id="btn_zoom_in" title="Zoom In">+</button>
+        </div>
+
+        <!-- MiniMap -->
+        <div class="minimap-wrapper" title="Click or drag to navigate canvas">
+          <canvas class="minimap-canvas" id="minimap_canvas"></canvas>
+        </div>
+      </section>
+
+      <!-- Right Node Property Inspector Drawer -->
+      <aside class="inspector-sidebar collapsed" id="inspector_sidebar">
+        <div class="inspector-header">
+          <div class="inspector-title">
+            <span>⚙️</span>
+            <span>Node Inspector</span>
+          </div>
+          <button class="node-btn close-inspector-btn" title="Close Drawer">✕</button>
+        </div>
+        <div class="inspector-body">
+          <!-- Populated dynamically by inspector.js -->
+        </div>
+      </aside>
+
+    </main>
+
+    <!-- Bottom Docked Console: Code Exporter, CLI Assistant, and Diagnostics -->
+    <footer class="code-drawer" id="code_drawer">
+      <div class="code-drawer-header">
+        <div class="code-tabs">
+          <button class="code-tab active" data-tab="native">
+            <span>📁 Native CrewAI (YAML)</span>
+          </button>
+          <button class="code-tab" data-tab="single">
+            <span>🐍 Executable Script (crew_runner.py)</span>
+          </button>
+          <button class="code-tab" data-tab="env">
+            <span>🔑 Environment (.env)</span>
+          </button>
+          <button class="code-tab" data-tab="reqs">
+            <span>📦 requirements.txt</span>
+          </button>
+          <button class="code-tab" data-tab="cli">
+            <span>💻 Terminal CLI Wizard</span>
+          </button>
+          <button class="code-tab" data-tab="diagnostics">
+            <span>🩺 Diagnostics Console</span>
+          </button>
+          <button class="code-tab" data-tab="dataset_review" id="tab_dataset_review">
+            <span>📋 Dataset Review Queue</span>
+            <span class="badge-count warning" id="dock_pending_badge" style="display: none;">0</span>
+          </button>
+          <button class="code-tab" data-tab="colab_bridge" id="tab_colab_bridge">
+            <span>🚀 Colab Training Bridge</span>
+          </button>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <button class="btn btn-ghost btn-sm" id="copy_code_btn" title="Copy Current Code to Clipboard">
+            📋 Copy
+          </button>
+          <button class="btn btn-ghost btn-sm" id="download_file_btn" title="Download Current File">
+            💾 Download File
+          </button>
+          <button class="btn btn-ghost btn-sm" id="toggle_drawer_btn" title="Toggle Dock Height">
+            ▼ Minimize
+          </button>
+        </div>
+      </div>
+
+      <!-- Sub-file Selector for Native CrewAI Project Structure -->
+      <div class="sub-file-selector" id="sub_file_bar">
+        <span style="font-size: 0.72rem; color: var(--text-dim); margin-right: 6px;">Active File:</span>
+        <button class="sub-file-pill active" data-file="agents.yaml">config/agents.yaml</button>
+        <button class="sub-file-pill" data-file="tasks.yaml">config/tasks.yaml</button>
+        <button class="sub-file-pill" data-file="crew.py">crew.py</button>
+        <button class="sub-file-pill" data-file="main.py">main.py</button>
+      </div>
+
+      <!-- Code Highlighting View Container -->
+      <div class="code-view-container" id="code_view_wrapper">
+        <pre class="code-pre"><code id="code_content" class="language-python"># Real-time code preview loading...</code></pre>
+      </div>
+
+      <!-- Embedded CLI Wizard View Container -->
+      <div class="dock-tab-panel" id="cli_tab_panel" style="display: none;">
+        <!-- Populated dynamically -->
+      </div>
+
+      <!-- Embedded Diagnostics View Container -->
+      <div class="dock-tab-panel" id="diagnostics_tab_panel" style="display: none;">
+        <!-- Populated dynamically -->
+      </div>
+
+      <!-- Embedded Dataset Review Queue View Container -->
+      <div class="dock-tab-panel" id="dataset_review_panel" style="display: none; padding: 0;">
+        <!-- Populated dynamically by dataset-review.js -->
+      </div>
+
+      <!-- Embedded Colab Training Bridge View Container -->
+      <div class="dock-tab-panel" id="colab_bridge_panel" style="display: none;">
+        <!-- Populated dynamically -->
+      </div>
+    </footer>
+
+    <!-- UNIFIED MODAL: LLM Providers, Models & Live Key Vault -->
+    <div class="modal-backdrop" id="vault_modal">
+      <div class="modal-card vault-card">
+        <div class="modal-header">
+          <div class="modal-title">
+            <span>🔑</span>
+            <span>LLM Providers, Models & Live Key Vault</span>
+          </div>
+          <button class="node-btn close-vault-btn">✕</button>
+        </div>
+        <div class="modal-body vault-body">
+          
+          <!-- Local Ollama Integration Section -->
+          <div class="vault-section">
+            <div class="vault-section-header">
+              <div class="vault-section-title">
+                <span class="provider-icon">🦙</span>
+                <span>Local Ollama Integration</span>
+              </div>
+              <div class="ollama-live-badge" id="vault_ollama_badge">
+                <span class="status-dot"></span>
+                <span id="vault_ollama_status_text">Checking...</span>
+              </div>
+            </div>
+
+            <div class="ollama-action-row">
+              <span class="ollama-desc">Direct auto-discovery on <code>http://localhost:11434</code>. Discovered models automatically populate node LLM dropdowns.</span>
+              <button class="btn btn-secondary btn-sm" id="btn_scan_ollama">
+                🔄 Scan / Re-check Models
+              </button>
+            </div>
+
+            <!-- Discovered Models Chips -->
+            <div class="discovered-models-container" id="discovered_models_list">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <div class="vault-divider"></div>
+
+          <!-- Cloud API Keys Section -->
+          <div class="vault-section">
+            <div class="vault-section-header">
+              <div class="vault-section-title">
+                <span class="provider-icon">☁️</span>
+                <span>Cloud LLM & Search API Keys</span>
+              </div>
+              <span class="vault-section-hint">Stored locally in your browser. Auto-populates into <code>.env</code>.</span>
+            </div>
+
+            <div class="key-inputs-grid" id="cloud_keys_grid">
+              <!-- Dynamically generated for OpenAI, Anthropic, Gemini, Groq, Serper -->
+            </div>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost btn-sm" id="btn_clear_keys">Clear All Keys</button>
+          <button class="btn btn-primary btn-sm" id="btn_save_vault">Save & Sync to .env</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Standalone CLI Wizard Modal (also accessible from dock) -->
+    <div class="modal-backdrop" id="cli_modal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div class="modal-title">
+            <span>💻</span>
+            <span>Direct CLI & Terminal Integration Assistant</span>
+          </div>
+          <button class="node-btn close-modal-btn">✕</button>
+        </div>
+        <div class="modal-body">
+          <!-- Populated by cli-wizard.js -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toast_container"></div>
+
+  </div>
+
+  <!-- Offline bundled dependencies -->
+  <script src="assets/jszip.min.js"></script>
+  <script src="assets/prism.min.js"></script>
+  <script src="assets/prism-python.min.js"></script>
+  <script src="assets/prism-yaml.min.js"></script>
+  <script src="assets/prism-bash.min.js"></script>
+
+  <!-- Main ES Module Application -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

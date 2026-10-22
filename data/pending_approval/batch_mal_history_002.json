@@ -1,0 +1,44 @@
+{
+  "id": "batch_mal_history_002",
+  "name": "Kerala History & Cultural Archives (Wikipedia Excerpts)",
+  "source": "https://ml.wikipedia.org/wiki/Kerala_History",
+  "timestamp": "2026-10-22 11:45:00",
+  "status": "pending_approval",
+  "total_records": 2,
+  "avg_density": 0.933,
+  "avg_fluency": 1.0,
+  "items": [
+    {
+      "id": "item_hist_01",
+      "title": "കേരളത്തിന്റെ പ്രാചീന വാണിജ്യ ചരിത്രം",
+      "raw_text": "<p>പ്രാചീന കാലം മുതൽ തന്നെ കേരളം സുഗന്ധവ്യഞ്ജന വ്യാപാരത്തിന്റെ പ്രധാന കേന്ദ്രമായിരുന്നു. മുസിരിസ് തുറമുഖം വഴി റോമാക്കാരുമായും അറബികളുമായും ശക്തമായ വാണിജ്യബന്ധം നിലനിന്നിരുന്നു എന്ന് ചരിത്ര രേഖകൾ സാക്ഷ്യപ്പെടുത്തുന്നു.</p>",
+      "cleaned_text": "പ്രാചീന കാലം മുതൽ തന്നെ കേരളം സുഗന്ധവ്യഞ്ജന വ്യാപാരത്തിന്റെ പ്രധാന കേന്ദ്രമായിരുന്നു. മുസിരിസ് തുറമുഖം വഴി റോമാക്കാരുമായും അറബികളുമായും ശക്തമായ വാണിജ്യബന്ധം നിലനിന്നിരുന്നു എന്ന് ചരിത്ര രേഖകൾ സാക്ഷ്യപ്പെടുത്തുന്നു.",
+      "malayalam_density": 0.9897,
+      "density_passed": true,
+      "chillu_fixes": 0,
+      "pii_redacted": 0,
+      "fluency_score": 1.0,
+      "quality_rating": "High Quality (Native Fluency)",
+      "passed_validation": true,
+      "audit_notes": [
+        "High morphological consistency and valid syntax"
+      ]
+    },
+    {
+      "id": "item_hist_02",
+      "title": "സാഹിത്യ പാരമ്പര്യവും തുഞ്ചത്ത് എഴുത്തച്ഛനും",
+      "raw_text": "ആധുനിക മലയാള ഭാഷയുടെ പിതാവായി കണക്കാക്കപ്പെടുന്ന തുഞ്ചത്ത് രാമാനുജൻ എഴുത്തച്ഛൻ കിളിപ്പാട്ട് പ്രസ്ഥാനത്തിലൂടെ ഭാഷയ്ക്ക് പുതിയൊരു ദിശാബോധം നല്&zwj;കി. അദ്ധ്യാത്മരാമായണം കിളിപ്പാട്ട് ഇതിന് ഉത്തമ ഉദാഹരണമാണ്. Helplines: 0471-2345678.",
+      "cleaned_text": "ആധുനിക മലയാള ഭാഷയുടെ പിതാവായി കണക്കാക്കപ്പെടുന്ന തുഞ്ചത്ത് രാമാനുജൻ എഴുത്തച്ഛൻ കിളിപ്പാട്ട് പ്രസ്ഥാനത്തിലൂടെ ഭാഷയ്ക്ക് പുതിയൊരു ദിശാബോധം നൽകി. അദ്ധ്യാത്മരാമായണം കിളിപ്പാട്ട് ഇതിന് ഉത്തമ ഉദാഹരണമാണ്. Helplines: 0471-2345678.",
+      "malayalam_density": 0.8762,
+      "density_passed": true,
+      "chillu_fixes": 1,
+      "pii_redacted": 0,
+      "fluency_score": 1.0,
+      "quality_rating": "High Quality (Native Fluency)",
+      "passed_validation": true,
+      "audit_notes": [
+        "High morphological consistency and valid syntax"
+      ]
+    }
+  ]
+}

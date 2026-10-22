@@ -1,0 +1,22 @@
+#!/usr/bin/env sh
+# Automated Pre-Commit Hook: Synchronize living architecture & validate documentation
+
+echo "🔄 [Doc-Pipeline] Running pre-commit architecture synchronization..."
+
+python scripts/doc_pipeline.py sync-architecture
+if [ $? -ne 0 ]; then
+    echo "❌ [Doc-Pipeline] Architecture sync failed."
+    exit 1
+fi
+
+python scripts/doc_pipeline.py validate
+if [ $? -ne 0 ]; then
+    echo "❌ [Doc-Pipeline] Documentation integrity validation failed."
+    exit 1
+fi
+
+# Automatically stage updated docs if any were updated during sync
+git add docs/
+
+echo "✅ [Doc-Pipeline] Zero-drift documentation verified and staged."
+exit 0

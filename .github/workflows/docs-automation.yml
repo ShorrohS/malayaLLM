@@ -1,0 +1,67 @@
+name: Automated Documentation Sync & Changelog Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'js/**'
+      - 'css/**'
+      - 'templates/**'
+      - 'docs/requirements/**'
+      - 'scripts/**'
+      - 'cli.py'
+      - 'server.py'
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync-and-validate-docs:
+    runs-on: ubuntu-latest
+    name: Verify Zero-Drift Documentation & Sync Architecture
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python Runtime
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Validate Documentation Integrity
+        run: |
+          python scripts/doc_pipeline.py validate
+
+      - name: Synchronize Active System Architecture & Flows
+        run: |
+          python scripts/doc_pipeline.py sync-architecture
+
+      - name: Check for Documentation Drift
+        id: git_status
+        run: |
+          git status --porcelain docs/
+          if [ -n "$(git status --porcelain docs/)" ]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and Push Synchronized Documentation
+        if: github.event_name == 'push' && steps.git_status.outputs.has_changes == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add docs/
+          git commit -m "docs(auto): zero-drift architecture & changelog sync [skip ci]"
+          git push

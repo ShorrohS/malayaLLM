@@ -1,0 +1,135 @@
+{
+  "project": "Visual CrewAI Agent & Workflow Builder",
+  "version": "2.2.0",
+  "last_updated": "2026-10-22 10:47:23 UTC",
+  "stages": [
+    {
+      "id": "STAGE-006",
+      "version": "2.2.0",
+      "title": "Malayalam End-to-End Autonomous Scraping, Human-Approval & Colab Training Pipeline",
+      "timestamp": "2026-10-22 10:47:23 UTC",
+      "status": "COMPLETED",
+      "business_requirement": "Build an end-to-end multi-agent pipeline and Operations Center extension for Malayalam corpus collection, NFKC and atomic chillu normalization, LLM-as-a-judge quality critique, human-in-the-loop review queue, multi-key round-robin/fallback rotation engine, and Google Colab QLoRA/Unsloth training handoff bridge.",
+      "user_story": "As an NLP engineer working with low-resource Indian languages, I want an autonomous scraping and morphological normalization workflow with human-in-the-loop batch verification and instant Google Colab checkpoint-relay training script export, so that I can collect high-purity Malayalam pre-training and instruction datasets without losing GPU progress.",
+      "implementation_summary": "Engineered utils/key_rotator.py with multi-key round-robin rotation, 429 rate-limit backoff, and provider cascade fallback. Implemented utils/malayalam_cleaner.py featuring NFKC normalization, atomic Chillu standardization, HTML stripping, Indian PII redaction, Malayalam unicode density gating (>=60%), and translationese heuristic evaluation. Created utils/colab_trainer_loader.py providing standalone Unsloth/PEFT QLoRA script with Google Drive checkpoint relay loop to bypass Colab 12-hour session timeouts. Built Operations Center Dataset Review Queue and Colab Training Bridge UI tabs with side-by-side comparison, density meters, approve/reject state transitions, and server.py REST endpoints (/api/dataset/*, /api/training/*, /api/key_rotator/*).",
+      "architectural_impact": "Transforms Visual CrewAI Studio into an enterprise-grade NLP corpus curation platform with multi-key API resilience, strict Dravidian linguistic normalization, human-in-the-loop dataset review, and direct training handoff to Google Colab and Kaggle.",
+      "files_impacted": [
+        "utils/key_rotator.py",
+        "utils/malayalam_cleaner.py",
+        "utils/colab_trainer_loader.py",
+        "utils/seed_dataset.py",
+        "js/dataset-review.js",
+        "js/templates.js",
+        "js/nodes.js",
+        "js/key-vault.js",
+        "js/generator.js",
+        "js/app.js",
+        "index.html",
+        "css/style.css",
+        "server.py"
+      ]
+    },
+    {
+      "id": "STAGE-005",
+      "version": "2.1.0",
+      "title": "Responsive Layout Viewport Overflow Fixes and Default 100% Offline Ollama Template",
+      "timestamp": "2026-10-21 07:32:32 UTC",
+      "status": "COMPLETED",
+      "business_requirement": "Resolve viewport responsive breakages across desktop, tablet, and mobile displays with collapsible header controls, fluid docked panels, and zero horizontal scrolling. Pre-load the 100% Offline Ollama Crew template by default on initial application boot for instant simulation readiness without cloud API credentials.",
+      "user_story": "As an AI engineer or enterprise developer working in on-premise air-gapped environments, I want the web application to adapt fluidly to any screen resolution and immediately boot into a functioning 100% local Ollama agent workflow so that I can visually configure and simulate multi-agent crews without setup friction or credential prerequisites.",
+      "implementation_summary": "Implemented strict flexbox/grid constraints with overflow-x: hidden and min-width: 0 across .app-container, .top-nav, canvas container, and docked drawers. Added collapsible header controls with an overflow dropdown menu for secondary actions (Snap, Fit, Zoom, JSON load/save, Clear) on screens below 992px while preserving persistent visibility of Ollama status and Key Vault pills. Added responsive drawer toggle for the left components panel with Ctrl+B shortcut. Configured WORKFLOW_TEMPLATES.offline_ollama with Local Research Specialist, Synthesis Task, and PrivateLocalCrew as default initial workflow, and enriched terminal dry-run sandbox with local daemon verification.",
+      "architectural_impact": "Ensures robust cross-resolution responsiveness with zero horizontal viewport overflow. Delivers a zero-friction out-of-the-box experience where new sessions automatically load a private local Ollama pipeline ready for immediate in-browser dry-run simulation.",
+      "files_impacted": [
+        "index.html",
+        "css/style.css",
+        "js/templates.js",
+        "js/cli-wizard.js",
+        "js/app.js"
+      ]
+    },
+    {
+      "id": "STAGE-004",
+      "version": "2.0.0",
+      "title": "Professional Operations Center & Live Key Vault Release",
+      "timestamp": "2026-10-21 06:59:07 UTC",
+      "status": "COMPLETED",
+      "business_requirement": "Redesign the application into a function-first Professional Operations Center with persistent status badges, real-time Ollama auto-discovery, live API key vault, and network/topology diagnostics.",
+      "user_story": "As an enterprise AI developer, I want a high-density, function-first workspace with live Ollama model auto-discovery, interactive diagnostics with click-to-fix links, visual error boundaries, and instant API key sync to .env.",
+      "implementation_summary": "Engineered unified KeyVault manager (js/key-vault.js) with Ollama model auto-discovery and live format validation; built DiagnosticsManager (js/diagnostics.js) for topology audits; redesigned index.html with persistent utility header, search-filterable accordion sidebar (Ctrl+K), high-contrast dot-matrix canvas (#FAFAFA/#E5E7EB), structured node data rows with error boundary warning banners; integrated dock with live Code Exporter, CLI Assistant, and Diagnostics Console; updated server.py with Ollama proxy.",
+      "architectural_impact": "Added KeyVault and DiagnosticsManager to system architecture; added Ollama proxy to local server; transformed UI into an enterprise operations center.",
+      "files_impacted": [
+        "index.html",
+        "css/style.css",
+        "js/app.js",
+        "js/canvas.js",
+        "js/key-vault.js",
+        "js/diagnostics.js",
+        "js/generator.js",
+        "server.py"
+      ]
+    },
+    {
+      "id": "STAGE-003",
+      "version": "1.2.0",
+      "title": "Warm Minimalist / Modern SaaS Workspace Redesign",
+      "timestamp": "2026-10-21 05:48:28 UTC",
+      "status": "COMPLETED",
+      "business_requirement": "Redesign the application from dark sci-fi into a clean, inviting Warm Minimalist SaaS workspace inspired by Linear, Notion, and Raycast.",
+      "user_story": "As a developer and designer, I want an inviting warm off-white workspace with soft natural shadows, terracotta primary accents, sage/amber/slate semantic node badges, and light theme syntax highlighting.",
+      "implementation_summary": "Overhauled css/style.css with warm cream canvas (#FBFBF9), subtle grid dots (#EAE8E4), pure white cards with soft multi-layered shadows and crisp borders (#E5E3DE), terracotta accent (#D95325), sage/amber/slate semantic node badges, light Prism syntax highlighting, Plus Jakarta Sans typography, friendly empty state, and instant copy feedback.",
+      "architectural_impact": "Refreshed UI design tokens, minimap palette, light code viewer, and interactive feedback across all components.",
+      "files_impacted": [
+        "css/style.css",
+        "index.html",
+        "js/canvas.js",
+        "js/cli-wizard.js",
+        "js/app.js",
+        "assets/prism-light.min.css"
+      ]
+    },
+    {
+      "id": "STAGE-002",
+      "version": "1.1.0",
+      "timestamp": "2026-10-20T23:00:00Z",
+      "status": "COMPLETED",
+      "business_requirement": "Architect and implement an automated, self-updating project documentation and changelog pipeline that eliminates documentation drift.",
+      "user_story": "As an architect and engineering team, we need the repository documentation to always mirror ground truth code and maintain a reverse-chronological requirements audit trail with zero manual overhead.",
+      "implementation_summary": "Engineered automated documentation engine (scripts/doc_pipeline.py) with zero-drift synchronization, reverse-chronological changelog updater, GitHub Actions CI workflow, and git hooks.",
+      "architectural_impact": "Introduced /docs/architecture/ and /docs/flows/ as dynamic living docs; added automated validation and sync hooks to CI/CD pipeline.",
+      "files_impacted": [
+        "docs/architecture/SYSTEM_ARCHITECTURE.md",
+        "docs/architecture/DATA_SCHEMAS.md",
+        "docs/flows/WORKFLOW_ORCHESTRATION_FLOW.md",
+        "docs/flows/AGENT_EXECUTION_FLOW.md",
+        "docs/CHANGELOG_REQUIREMENTS.md",
+        "scripts/doc_pipeline.py",
+        ".github/workflows/docs-automation.yml"
+      ]
+    },
+    {
+      "id": "STAGE-001",
+      "version": "1.0.0",
+      "timestamp": "2026-10-20T22:30:00Z",
+      "status": "COMPLETED",
+      "business_requirement": "Deliver a no-code visual workstation and CLI orchestrator for building, configuring, and exporting production-ready CrewAI workflows.",
+      "user_story": "As an AI developer or non-programmer, I want to visually design agents, tasks, and tools on a modern canvas and immediately get production CrewAI YAMLs, standalone scripts, and one-click CLI execution.",
+      "implementation_summary": "Built full-featured interactive web application with pan/zoom canvas, bezier connectors, node inspector, real-time multi-tab code generator, pre-built templates, CLI wizard with dry-run simulator, and standalone Python CLI orchestrator.",
+      "architectural_impact": "Established client-side reactive graph model with multi-target compilation, offline bundled assets (Prism, JSZip), and dual execution paths (Web UI vs Headless CLI).",
+      "files_impacted": [
+        "index.html",
+        "css/style.css",
+        "js/canvas.js",
+        "js/nodes.js",
+        "js/inspector.js",
+        "js/generator.js",
+        "js/templates.js",
+        "js/cli-wizard.js",
+        "js/exporter.js",
+        "js/app.js",
+        "server.py",
+        "cli.py",
+        "README.md"
+      ]
+    }
+  ]
+}

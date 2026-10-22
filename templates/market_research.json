@@ -1,0 +1,104 @@
+{
+  "nodes": [
+    {
+      "id": "tool_serper",
+      "type": "tool",
+      "x": 60,
+      "y": 120,
+      "tool_type": "SerperDevTool",
+      "name": "Google Search (Serper)",
+      "api_key_env": "SERPER_API_KEY"
+    },
+    {
+      "id": "tool_scrape",
+      "type": "tool",
+      "x": 60,
+      "y": 300,
+      "tool_type": "ScrapeWebsiteTool",
+      "name": "Website Scraper",
+      "api_key_env": null
+    },
+    {
+      "id": "agent_researcher",
+      "type": "agent",
+      "x": 360,
+      "y": 100,
+      "name": "Lead_Market_Researcher",
+      "role": "Senior Market Research Analyst",
+      "goal": "Uncover real-time industry trends, competitor product launches, and strategic announcements",
+      "backstory": "Veteran market analyst known for digging through deep search queries and surfacing high-signal intelligence.",
+      "llm_provider": "OpenAI",
+      "model_name": "gpt-4o",
+      "temperature": 0.5,
+      "verbose": true,
+      "allow_delegation": false,
+      "memory": true,
+      "max_iter": 20
+    },
+    {
+      "id": "agent_writer",
+      "type": "agent",
+      "x": 360,
+      "y": 360,
+      "name": "Executive_Brief_Writer",
+      "role": "Chief Strategy Communications Editor",
+      "goal": "Synthesize raw research into polished, board-ready executive summaries with actionable recommendations",
+      "backstory": "Former financial journalist who crafts razor-sharp executive briefings with clear quantitative bullet points.",
+      "llm_provider": "Anthropic",
+      "model_name": "claude-3-5-sonnet-20241022",
+      "temperature": 0.7,
+      "verbose": true,
+      "allow_delegation": false,
+      "memory": true,
+      "max_iter": 15
+    },
+    {
+      "id": "task_investigate",
+      "type": "task",
+      "x": 740,
+      "y": 100,
+      "name": "Investigate_Market_Signals",
+      "title": "Investigate Next-Gen AI Trends",
+      "description": "Conduct exhaustive web research on the state of autonomous AI agents in 2026. Identify top 3 vendor initiatives and key industry benchmarks.",
+      "expected_output": "Detailed structured report with verified source links and key quantitative milestones.",
+      "agent_id": "agent_researcher",
+      "async_execution": false,
+      "output_file": "raw_research_data.md",
+      "human_input": false
+    },
+    {
+      "id": "task_synthesize",
+      "type": "task",
+      "x": 740,
+      "y": 360,
+      "name": "Generate_Executive_Brief",
+      "title": "Draft Board Executive Summary",
+      "description": "Take findings from the market investigation task and draft an executive briefing including SWOT analysis and 3 strategic recommendations.",
+      "expected_output": "A clean 5-section Markdown executive document ready for senior leadership review.",
+      "agent_id": "agent_writer",
+      "async_execution": false,
+      "output_file": "executive_market_brief_2026.md",
+      "human_input": false
+    },
+    {
+      "id": "crew_config",
+      "type": "crew",
+      "x": 1100,
+      "y": 220,
+      "name": "MarketIntelligenceCrew",
+      "process": "sequential",
+      "manager_llm": "gpt-4o",
+      "memory": true,
+      "verbose": 2,
+      "cache": true,
+      "max_rpm": 120
+    }
+  ],
+  "connections": [
+    { "id": "c1", "type": "tool-agent", "sourceId": "tool_serper", "targetId": "agent_researcher" },
+    { "id": "c2", "type": "tool-agent", "sourceId": "tool_scrape", "targetId": "agent_researcher" },
+    { "id": "c3", "type": "agent-task", "sourceId": "agent_researcher", "targetId": "task_investigate" },
+    { "id": "c4", "type": "agent-task", "sourceId": "agent_writer", "targetId": "task_synthesize" },
+    { "id": "c5", "type": "task-task", "sourceId": "task_investigate", "targetId": "task_synthesize" }
+  ]
+}
